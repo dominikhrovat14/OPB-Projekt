@@ -82,7 +82,7 @@ def zacetna_get():
 @get('/prijava')
 def prijava_get():
     napaka = nastaviSporocilo()
-    return template('prijava.html', napaka=napaka)
+    return template('prijava.html', napaka=napaka, noMenu='true')
 
 @post('/prijava')
 def prijava_post():
@@ -129,7 +129,7 @@ def uporabnik():
     cur.execute("""SELECT COUNT (*) FROM izposoja WHERE id_uporabnika=1""", (oseba[1], ))
 
     sporocilo = ''
-    return template('uporabnik.html', oseba=oseba,napaka=napaka, sporocilo=sporocilo)
+    return template('uporabnik.html', oseba=oseba,napaka=napaka, sporocilo=sporocilo,noMenu='false')
 
     
 #___________________________________________________________________________________________________________________________
@@ -138,7 +138,7 @@ def uporabnik():
 def registracija_get():
     print("registracija")
     napaka = nastaviSporocilo()
-    return template('registracija.html', napaka=napaka)
+    return template('registracija.html', napaka=napaka,noMenu='true')
 
 
 @post('/registracija')
@@ -157,12 +157,19 @@ def registracija_post():
     upor = cur.fetchone()
     if upor is not None:
         return template("registracija.html", name=name, surname=surname, username=username,
-                               email=email, napaka="Uporabniško ime je že zasedeno!")
+                               email=email, napaka="Uporabniško ime je že zasedeno!", noMenu='true')
 
     # preverimo, ali se gesli ujemata
     if password != password_check:
         return template("registracija.html", name=name, surname=surname, username=username,
-                               email=email, napaka="Gesli se ne ujemata!")
+                               email=email, napaka="Gesli se ne ujemata!", noMenu='true')
+
+    #preverimo, ce je email ze obstaja
+    cur.execute("SELECT * FROM uporabnik WHERE email=%s", (email,))
+    upor = cur.fetchone()
+    if upor is not None:
+        return template("registracija.html", name=name, surname=surname, username=username,
+                               email=email, napaka="Vnešen email že obstaja!", noMenu='true')
 
     cur.execute("""INSERT INTO uporabnik (ime, priimek, username, email, geslo, starost, naslov) VALUES (%s, %s, %s, %s, %s, %s, %s)""", (name,surname, username,email,password,starost,adress, ))
     redirect(url('uporabnik'))
@@ -177,7 +184,7 @@ def brskalnik_get():
         SELECT id, naslov, avtor, ocena, stevilo_ocen, leto_izdaje, dolzina, zanr, jezik FROM knjiga
     """)
     knjige = cur.fetchall()
-    return template('brskalnik.html', napaka=napaka, knjige = knjige)
+    return template('brskalnik.html', napaka=napaka, knjige = knjige, noMenu='false')
 
 
 
@@ -194,7 +201,7 @@ def moje_knjige_get():
     k = cur.execute("""SELECT id FROM knjiga""")
                         #WHERE id_uporabnika=%s""",(id_uporabnika,))
     k = cur.fetchall()
-    return template('moje_knjige.html', napaka=napaka)
+    return template('moje_knjige.html', napaka=napaka, noMenu='false')
 
 
 #___________________________________________________________________________________________________________________________
