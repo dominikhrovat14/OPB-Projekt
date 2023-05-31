@@ -1,0 +1,41 @@
+table, th, td {    
+margin-left: auto;  
+margin-right: auto;  
+margin-top: auto;
+border-collapse: collapse;    
+width: 500px;  
+text-align: center;  
+font-size: 20px;  
+}    
+
+.zacetni_gumb {
+
+	font-size : 2.5rem!important;
+	background-color: #F9F9C5!important;
+	border-color: #ffcc80!important;
+	color : black!important;
+	
+}
+
+.zacetni_gumb:hover a{
+
+	 background-color: #b5f18e;
+	
+}
+
+.orodna_vrstica{
+	
+
+	background-color: #D9F8C4;	
+	
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.navbar a:hover, .dropdown:hover .dropbtn {
+  background-color: #b5f18e;
+}
+

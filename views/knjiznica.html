@@ -1,0 +1,27 @@
+% setdefault(napaka, '')
+% rebase('base.html', napaka = napaka, knjige=knjige, naslov = 'Knjige')
+% include('orodna_vrstica.html', povezava='/knjiznica', stolpci=[0,1,2])
+
+
+<table id="izpis" class = "table table-success table-striped">
+    <tr>
+        <th>ŠTEVILKA KNJIGE</th>
+        <th>AVTOR</th>
+        <th>NASLOV</th>
+        <th>IZPOSOJA</th>
+    </tr>
+    
+    %for (id_knjige, naslov, id_avtorja, cena_nakupa) in knjige:
+        <tr>
+            <td>{{id_knjige}}</td>
+            <td>{{id_avtorja}}</td>
+            <td>{{naslov}}</td>
+            <td>
+                <form action="{{url('kupi_knjigo', id_knjige=id_knjige)}}" method="post"> 
+                    <a href="#" onclick="this.parentElement.submit()"> Izposodi </a>
+                </form>
+            </td>
+        </tr>
+    %end
+    
+</table>

@@ -1,0 +1,58 @@
+<!-- BOOTSTRAP STARTER TEMPLATE -->
+<!-- osnovni html, ki je uporabljen v vseh ostalih, glej rebase (moramo podati naslov in napaka) -->
+
+<!doctype html>
+<html lang="sl">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <title>E-Knjigarna</title>
+		 <link rel="stylesheet" href="./static/style.css">
+        
+    </head>
+    <body>
+        <!-- orodna vrstica-->
+
+        <nav class="navbar navbar-light orodna_vrstica">
+            <div class="container">
+                <a class="navbar-brand" href="{{url('zacetna_get')}}">
+                    <img src="{{url('static', filename= '/img/logo_zadnji3.png')}}" alt="" width="250" height="150">
+                </a>
+            </div>                
+        </nav>
+
+        
+        
+        <!--sem notri vstavimo ostale htmlje-->
+        <div class="container center" style="padding-top:80px">  <!--div se vedno razširi čez cel blok, zato damo container, da zavzame optimalno prostora-->
+
+            <table > 
+			
+				<tr>
+					<td style=" padding-right: 40px;">
+					 <a href="{{url('prijava_get')}}" class="zacetni_gumb btn btn-primary">Prijava</a>
+					</td>
+
+					<td>
+					 <a href="{{url('registracija_get')}}" class="zacetni_gumb btn btn-primary">Registracija</a>
+					</td> 
+
+				</tr>
+			
+			</table>
+			
+        </div>
+
+
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    </body>
+</html>

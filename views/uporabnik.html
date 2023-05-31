@@ -1,0 +1,50 @@
+% setdefault('napaka', '')
+% rebase('base.html', napaka=napaka, oseba=oseba, sporocilo=sporocilo, naslov='Domača stran')
+
+
+<h3>{{oseba[1]}} {{oseba[2]}}, pozdravljeni v eKnjižnici!</h3>
+<table id="izpis" class = "table table-success table-striped">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Username</label>
+                </div>
+                <div class="col-md-6">
+                    <p>{{oseba[3]}}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Ime in priimek</label>
+                </div>
+                <div class="col-md-6">
+                    <p>{{oseba[1]}} {{oseba[2]}}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Email</label>
+                </div>
+                <div class="col-md-6">
+                    <p>{{oseba[5]}}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Starost</label>
+                </div>
+                <div class="col-md-6">
+                    <p>{{oseba[6]}}</p>
+                </div>
+            </div>
+
+
+</table>
+
+
+
+
+
+
+
+
+
