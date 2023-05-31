@@ -173,10 +173,8 @@ def registracija_post():
 def brskalnik_get():
     oseba = preveriUporabnika()
     napaka = nastaviSporocilo()
-    cur = baza.cursor()
     knjige = cur.execute("""
-        SELECT id_knjige, naslov FROM knjiga
-        
+        SELECT id, naslov, avtor, ocena, stevilo_ocen, leto_izdaje, dolzina, zanr, jezik FROM knjiga
     """)
     knjige = cur.fetchall()
     return template('brskalnik.html', napaka=napaka, knjige = knjige)
@@ -190,13 +188,13 @@ def brskalnik_get():
 @get('/moje_knjige')
 def moje_knjige_get():
     print("test")
-    #napaka = nastaviSporocilo()
-    #oseba = preveriUporabnika()
-    #id_uporabnika = oseba[0]
-    #k = cur.execute("""SELECT id FROM knjiga""")
+    napaka = nastaviSporocilo()
+    oseba = preveriUporabnika()
+    id_uporabnika = oseba[0]
+    k = cur.execute("""SELECT id FROM knjiga""")
                         #WHERE id_uporabnika=%s""",(id_uporabnika,))
-    #k = cur.fetchall()
-    #return template('moje_knjige.html', napaka=napaka)
+    k = cur.fetchall()
+    return template('moje_knjige.html', napaka=napaka)
 
 
 #___________________________________________________________________________________________________________________________
