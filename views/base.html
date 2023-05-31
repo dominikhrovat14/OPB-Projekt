@@ -21,10 +21,14 @@
                 <a class="navbar-brand" href="{{url('zacetna_get')}}">
                     <img src="{{url('static', filename= '/img/logo_zadnji3.png')}}" alt="" width="440" height="150">
                 </a>
-                <a href="{{url('uporabnik')}}" class="text-dark">Profil</a>
+				%if noMenu == 'true':
+                
+				%else:
+				<a href="{{url('uporabnik')}}" class="text-dark">Profil</a>
                 <a href="{{url('moje_knjige_get')}}" class="text-dark">Zgodovina izposoj</a>
 				<a href="{{url('brskalnik_get')}}" class="text-dark">Brskaj</a>
                 <a href="{{url('odjava_get')}}" class="text-dark">Odjava</a>
+				%end
             </div>                
         </nav>
         
