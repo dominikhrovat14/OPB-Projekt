@@ -37,7 +37,7 @@ glava_uporabniki = []
 podatki_uporabniki = []
 
 with open(filename_uporabiki, 'r',encoding="utf8" ) as csvfile:
-    csv_reader = csv.reader(csvfile, delimiter=',')
+    csv_reader = csv.reader(csvfile, delimiter=';')
     glava_uporabniki = next(csv_reader)
     for row in csv_reader:
         podatki_uporabniki.append(row)
@@ -78,12 +78,9 @@ def uvozi_uporabnike(cur):
         email = row[3]
         geslo = row[4]
         starost = int(row[5])
-        kraj = row[6]
-        ulica = row[7]
-        hisna = int(row[8])
-        posta = int(row[9])
-        sqlinsert = """INSERT INTO uporabnik (ime, priimek, username, email, geslo, starost, kraj, ulica, hisna, posta) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-        cur.execute(sqlinsert, (ime, priimek, username, email, geslo, starost, kraj, ulica, hisna, posta,))
+        naslov = row[6]
+        sqlinsert = """INSERT INTO uporabnik (ime, priimek, username, email, geslo, starost, naslov) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+        cur.execute(sqlinsert, (ime, priimek, username, email, geslo, starost, naslov,))
 
 
 
@@ -91,7 +88,7 @@ with psycopg2.connect(database=db, host=host, user=user, password=password) as c
     cur = con.cursor()
     #uvozi_knjige(cur)
     #uvoz_opisov(cur)
-    uvozi_uporabnike(cur)
+    #uvozi_uporabnike(cur)
     con.commit()
 
 
