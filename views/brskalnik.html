@@ -4,12 +4,24 @@
     <tr>
         <th>NASLOV</th>
         <th>AVTOR</th>
-		<th>JEZIK</th>
-		<th>ŽANR</th>
-		<th>DOLŽINA</th>
 		<th>OCENA</th>
-		<th>ŠTEVILO OCEN</th>
+		<th>LETO IZDAJE</th>
+		<th>DOLŽINA</th>
+		<th>ŽANR</th>
     </tr>    
+
+	%for (id, naslov, avtor, ocena, stevilo_ocen, leto_izdaje, dolzina, zanr, jezik) in knjige:
+	<tr>
+		<td>{{naslov}}</td>
+		<td>{{avtor}}</td>
+		<td>{{ocena}}</td>
+		<td>{{leto_izdaje}}</td>
+		<td>{{dolzina}}</td>
+		<td>{{zanr}}</td>
+		
+	</tr>
+%end
 
 
 </table>
+
