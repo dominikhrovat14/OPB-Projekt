@@ -39,10 +39,7 @@ cur.execute("CREATE TABLE uporabnik ( "
       + " email TEXT NOT NULL UNIQUE, "
       + " geslo TEXT NOT NULL, "
       + " starost INTEGER, "
-      + " kraj TEXT NOT NULL, "
-      + " ulica TEXT NOT NULL, "
-      + " hisna INTEGER NOT NULL, "
-      + " posta INTEGER NOT NULL); "
+      + " naslov TEXT NOT NULL); "
       )
 
 
