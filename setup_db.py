@@ -37,33 +37,54 @@ print("PRAVICE DODANE")
 
 
 # Kreiranje tabele uporabnik
-cur.execute("CREATE TABLE uporabnik ( "
-      + " id SERIAL PRIMARY KEY, "
-      + " ime TEXT NOT NULL, "
-      + " priimek TEXT NOT NULL, "
-      + " username TEXT NOT NULL UNIQUE, "
-      + " geslo TEXT NOT NULL, "
-      + " email TEXT NOT NULL UNIQUE, "
-      + " starost INTEGER); ")
+cur.execute("CREATE TABLE avtor ( "
+      + " avtor_id SERIAL PRIMARY KEY, "
+      + " ime_avtor TEXT NOT NULL, "
+      + " zivljenjepis TEXT NOT NULL); ")
 
 # Kreiranje tabele knjiga
 cur.execute("CREATE TABLE knjiga ( "
       + " id SERIAL PRIMARY KEY, "
       + " naslov TEXT NOT NULL, "
+      + " naslov_orig TEXT, "
+      + " ISBN TEXT, "
       + " ocena DECIMAL NOT NULL DEFAULT 0, "
       + " stevilo_ocen INTEGER NOT NULL DEFAULT 0, "
-      + " leto_izdaje INTEGER NOT NULL, "
-      + " dolzina INTEGER NOT NULL UNIQUE, "
-      + " zanr TEXT NOT NULL, "
+      + " leto_izdaje DATE, "
+      + " avtor_id INTEGER NOT NULL, "
+      + " opis TEXT, "
       + " jezik TEXT NOT NULL); ")
 
 # kreiranje tabele izposoja
 
-cur.execute("CREATE TABLE izposoja ( "
+cur.execute("CREATE TABLE lastnosti ( "
+      + " id_knjige INTEGER, "
+      + " v_z INTEGER , "
+      + " z_r INTEGER , "
+      + " p_s INTEGER , "
+      + " p_n INTEGER , "
+      + " d_p INTEGER , "
+      + " n_n INTEGER , "
+      + " o_c INTEGER , "
+      + " o_n INTEGER , "
+      + " l_z INTEGER ); ")
+
+cur.execute("CREATE TABLE nagrade ( "
+      + " book_id INTEGER, "
+      + " nagrada TEXT ); ")
+
+cur.execute("CREATE TABLE uporabnik ( "
       + " id SERIAL PRIMARY KEY, "
-      + " id_knjige INTEGER NOT NULL, "
-      + " id_uporabnika INTEGER NOT NULL, "
-      + " datum_izposoje DATE NOT NULL, "
-      + " datum_vracila DATE NOT NULL); ")
+      + " ime TEXT NOT NULL, "
+      + " priimek TEXT NOT NULL, "
+      + " username TEXT NOT NULL UNIQUE, "
+      + " mail TEXT NOT NULL UNIQUE, "
+      + " geslo TEXT NOT NULL UNIQUE, "
+      + " rojstvo DATE NOT NULL, "
+      + " naslov TEXT); ")
+
+cur.execute("CREATE TABLE zanri ( "
+      + " book_id INTEGER, "
+      + " zanr TEXT ); ")
 
 print("KONČANO BREZ NAPAK")
