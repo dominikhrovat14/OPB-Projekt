@@ -208,7 +208,7 @@ def brskalnik_get():
 @post('/brskalnik')
 def brskalnik():
 
-    name = request.forms.name
+    name = request.forms.name + ""
     year = request.forms.year
     oseba = preveriUporabnika()
     napaka = nastaviSporocilo()
@@ -216,10 +216,16 @@ def brskalnik():
     query = """SELECT id, naslov, avtor_id, ocena, stevilo_ocen, EXTRACT('year' FROM leto_izdaje) as leto_izdaje, jezik FROM knjiga """
 
     appendWhere = False
-    
-    if len(name) > 0:
-        query += " WHERE name= "+name
+
+    dolzina = len(name)
+
+    if dolzina > 0:
+        query += " WHERE naslov = "+ " '"+ name +"' "
         appendWhere = True
+    
+##    if len(name) > 0:
+##        query += " WHERE name= "+name
+##        appendWhere = True
 
     if year != 'all':
         if appendWhere:
