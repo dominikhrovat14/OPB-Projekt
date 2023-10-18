@@ -1,27 +1,81 @@
 % setdefault(napaka, '')
 % rebase('base.html', napaka = napaka, naslov = 'Brskalnik')
-<table id="izpis" class = "table">
-    <tr>
-        <th>NASLOV</th>
-        <th>AVTOR</th>
-		<th>OCENA</th>
-		<th>LETO IZDAJE</th>
-		<th>DOLŽINA</th>
-		<th>ŽANR</th>
-    </tr>    
 
-	%for (id, naslov, avtor, ocena, stevilo_ocen, leto_izdaje, dolzina, zanr, jezik) in knjige:
+
+<html>
+<body>
+
+<table style="width:100%;">
+
 	<tr>
-		<td>{{naslov}}</td>
-		<td>{{avtor}}</td>
-		<td>{{ocena}}</td>
-		<td>{{leto_izdaje}}</td>
-		<td>{{dolzina}}</td>
-		<td>{{zanr}}</td>
+		<td id="firstColumn" style="vertical-align:top">
+		
+			<table id="tableData">
+
+
+				<tr>
+					<th>NASLOV</th>
+					<th>AVTOR</th>
+					<th>OCENA</th>
+					<th>LETO IZDAJE</th>
+					<th>DOLŽINA</th>
+					<th>ŽANR</th>
+				</tr>    
+
+				%for (id, naslov, avtor_id, ocena, stevilo_ocen, leto_izdaje, jezik) in knjige:
+				<tr id={{id}}>
+					<td class="naslovClass" id=naslov_{{id}}>{{naslov}}</td>
+					<td>{{avtor_id}}</td>
+					<td>{{ocena}}</td>
+					<td>{{leto_izdaje}}</td>
+					<td>{{jezik}}</td>
+				</tr>
+				%end
+
+
+			</table>
+			
+			
+		</td>
+		<td id="secondColumn" style="vertical-align:top">
+			
+			<form id="formData" action="{{url('brskalnik')}}" method="POST">
+				<div style="float:left">
+					<p style="float:left">Ime: <input type="text" name="name" value="d"></p>
+				</div>
+				<div style="float:left">
+					Leto: 
+					<select name="year" id="year" >
+					%for (leto_izdaje) in filterYearKnjige:
+							<option value={{leto_izdaje}}>{{leto_izdaje}}</option>
+					%end
+					</select>
+				</div>
+				<div>
+					<p><input type="submit" value="Brskaj"></p>
+				</div>
+			</form>
+		
+		</td>
 		
 	</tr>
-%end
-
-
 </table>
+
+<script>
+
+
+	var tab = document.getElementById("tableData");
+	document.getElementById("secondColumn").appendChild(tab);
+	
+	var formData = document.getElementById("formData");
+	document.getElementById("firstColumn").appendChild(formData);
+	
+	
+	
+</script>
+
+
+
+</body>
+</html>
 

@@ -21,7 +21,7 @@ SERVER_PORT = os.environ.get('BOTTLE_PORT', 8080)
 RELOADER = os.environ.get('BOTTLE_RELOADER', True)
 ROOT = os.environ.get('BOTTLE_ROOT', '/') 
 DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
-
+os.getcwd()
 
 #__________________________________________________________________________________________________________
 #FUNKCIJE
@@ -88,6 +88,7 @@ def prijava_get():
 def prijava_post():
     username = request.forms.username
     geslo = request.forms.password
+    
     if username is None or geslo is None:
         nastaviSporocilo('Uporabniško ime in geslo morata biti neprazna') 
         redirect(url('prijava_get'))   
@@ -126,7 +127,7 @@ def uporabnik():
     if oseba is None: 
         return
     napaka = nastaviSporocilo()
-    cur.execute("""SELECT COUNT (*) FROM izposoja WHERE id_uporabnika=1""", (oseba[1], ))
+    #cur.execute("""SELECT COUNT (*) FROM izposoja WHERE id_uporabnika=1""", (oseba[1], ))
 
     sporocilo = ''
     return template('uporabnik.html', oseba=oseba,napaka=napaka, sporocilo=sporocilo,noMenu='false')
@@ -150,7 +151,7 @@ def registracija_post():
     adress = request.forms.adress
     password = request.forms.password
     password_check = request.forms.password_check
-    starost = request.forms.age
+    rojstvo = request.forms.age
 
     #preverimo, ce je izbrani username ze zaseden
     cur.execute("SELECT * FROM uporabnik WHERE username=%s", (username,))
@@ -165,26 +166,81 @@ def registracija_post():
                                email=email, napaka="Gesli se ne ujemata!", noMenu='true')
 
     #preverimo, ce je email ze obstaja
-    cur.execute("SELECT * FROM uporabnik WHERE email=%s", (email,))
+    cur.execute("SELECT * FROM uporabnik WHERE mail=%s", (email,))
     upor = cur.fetchone()
     if upor is not None:
         return template("registracija.html", name=name, surname=surname, username=username,
                                email=email, napaka="Vnešen email že obstaja!", noMenu='true')
 
-    cur.execute("""INSERT INTO uporabnik (ime, priimek, username, email, geslo, starost, naslov) VALUES (%s, %s, %s, %s, %s, %s, %s)""", (name,surname, username,email,password,starost,adress, ))
+    cur.execute("""INSERT INTO uporabnik (ime, priimek, username, mail, geslo, rojstvo, naslov) VALUES (%s, %s, %s, %s, %s, %s, %s)""", (name,surname, username,email,password,'2021-05-20',adress, ))
     redirect(url('uporabnik'))
 
 #___________________________________________________________________________________________________________________________
 # BRSKALNIK
 @get('/brskalnik')
 def brskalnik_get():
+    
+
     oseba = preveriUporabnika()
     napaka = nastaviSporocilo()
+
+    
+    
     knjige = cur.execute("""
-        SELECT id, naslov, avtor, ocena, stevilo_ocen, leto_izdaje, dolzina, zanr, jezik FROM knjiga
+        SELECT id, naslov, avtor_id, ocena, stevilo_ocen, EXTRACT('year' FROM leto_izdaje), jezik FROM knjiga ORDER BY EXTRACT('year' FROM leto_izdaje)
     """)
     knjige = cur.fetchall()
-    return template('brskalnik.html', napaka=napaka, knjige = knjige, noMenu='false')
+
+    query = """
+     SELECT DISTINCT EXTRACT('year' FROM leto_izdaje) as leto_izdaje FROM knjiga ORDER BY leto_izdaje
+     """
+
+    filterYearKnjige = cur.execute(query)
+    filterYearKnjige = cur.fetchall()
+
+    results=[]
+    for item in filterYearKnjige:
+        results.append(item[0])
+    
+    return template('brskalnik.html', napaka=napaka, knjige = knjige, filterYearKnjige = results, noMenu='false')
+
+
+@post('/brskalnik')
+def brskalnik():
+
+    name = request.forms.name
+    year = request.forms.year
+    oseba = preveriUporabnika()
+    napaka = nastaviSporocilo()
+
+    query = """SELECT id, naslov, avtor_id, ocena, stevilo_ocen, EXTRACT('year' FROM leto_izdaje) as leto_izdaje, jezik FROM knjiga """
+
+    appendWhere = False
+    
+    if len(name) > 0:
+        query += " WHERE name= "+name
+        appendWhere = True
+
+    if year != 'all':
+        if appendWhere:
+            query += " AND  EXTRACT('year' FROM leto_izdaje) = "+ year
+        else:
+            appendWhere = True
+            query += " WHERE EXTRACT('year' FROM leto_izdaje) = "+ year
+
+    knjige = cur.execute(query)
+    knjige = cur.fetchall()
+
+    
+    filterYearKnjige = cur.execute("""
+     SELECT DISTINCT EXTRACT('year' FROM leto_izdaje) as leto_izdaje FROM knjiga ORDER BY leto_izdaje
+     """)
+    filterYearKnjige = cur.fetchall()
+    results=[]
+    for item in filterYearKnjige:
+        results.append(item[0])
+    
+    return template('brskalnik.html', napaka=napaka, knjige = knjige, filterYearKnjige = results, noMenu='false')
 
 
 
@@ -220,3 +276,4 @@ cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 #Požnemo strežnik
 run(host='localhost', port=SERVER_PORT, reloader=RELOADER) # reloader=True nam olajša razvoj (osveževanje sproti - razvoj)
 #http://127.0.0.1:8080/
+print("http://127.0.0.1:8080/")

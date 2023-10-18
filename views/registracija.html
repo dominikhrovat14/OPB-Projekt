@@ -1,6 +1,9 @@
 % setdefault('napaka', '')
 % rebase('base.html', napaka=napaka, naslov='Registracija')
 
+
+
+
 <form action="/registracija" method="post" autocomplete="off">
   <div class="form-row">
     <div class="form-group col-md-6">
@@ -67,7 +70,7 @@
   </div>
   <div class="form-row">
     <div class="form-group col-md-6">
-      <label for="age">Starost</label>
+      <label for="age">Rojstvo</label>
       <input id="age" name="age" type="text" class="form-control" required
         oninput="this.setCustomValidity('')"
         oninvalid="this.setCustomValidity('Obvezno polje')"
