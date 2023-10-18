@@ -38,27 +38,27 @@ print("PRAVICE DODANE")
 
 # Kreiranje tabele uporabnik
 cur.execute("CREATE TABLE avtor ( "
-      + " avtor_id SERIAL PRIMARY KEY, "
+      + " avtor_id INTEGER PRIMARY KEY, "
       + " ime_avtor TEXT NOT NULL, "
       + " zivljenjepis TEXT NOT NULL); ")
 
 # Kreiranje tabele knjiga
 cur.execute("CREATE TABLE knjiga ( "
-      + " id SERIAL PRIMARY KEY, "
+      + " id INTEGER PRIMARY KEY, "
       + " naslov TEXT NOT NULL, "
       + " naslov_orig TEXT, "
       + " ISBN TEXT, "
       + " ocena DECIMAL NOT NULL DEFAULT 0, "
       + " stevilo_ocen INTEGER NOT NULL DEFAULT 0, "
       + " leto_izdaje DATE, "
-      + " avtor_id INTEGER NOT NULL, "
+      + " avtor_id INTEGER NOT NULL REFERENCES avtor(avtor_id), "
       + " opis TEXT, "
       + " jezik TEXT NOT NULL); ")
 
 # kreiranje tabele izposoja
 
 cur.execute("CREATE TABLE lastnosti ( "
-      + " id_knjige INTEGER, "
+      + " book_id INTEGER NOT NULL , "
       + " v_z INTEGER , "
       + " z_r INTEGER , "
       + " p_s INTEGER , "
@@ -67,11 +67,32 @@ cur.execute("CREATE TABLE lastnosti ( "
       + " n_n INTEGER , "
       + " o_c INTEGER , "
       + " o_n INTEGER , "
-      + " l_z INTEGER ); ")
+      + " l_z INTEGER , "
+      + " PRIMARY KEY (book_id), "
+      + " FOREIGN KEY (book_id) REFERENCES knjiga(id), "
+      + " CHECK (v_z >= 0), "
+      + " CHECK (v_z <= 100), "
+      + " CHECK (z_r >= 0), "
+      + " CHECK (z_r <= 100), "
+      + " CHECK (p_s >= 0), "
+      + " CHECK (p_s <= 100), "
+      + " CHECK (p_n >= 0), "
+      + " CHECK (p_n <= 100), "
+      + " CHECK (d_p >= 0), "
+      + " CHECK (d_p <= 100), "
+      + " CHECK (n_n >= 0), "
+      + " CHECK (n_n <= 100), "
+      + " CHECK (o_c >= 0), "
+      + " CHECK (o_c <= 100), "
+      + " CHECK (o_n >= 0), "
+      + " CHECK (o_n <= 100), "
+      + " CHECK (l_z >= 0), "
+      + " CHECK (l_z <= 100) ); ")
 
 cur.execute("CREATE TABLE nagrade ( "
-      + " book_id INTEGER, "
-      + " nagrada TEXT ); ")
+      + " book_id INTEGER NOT NULL, "
+      + " nagrada TEXT, "
+      + " FOREIGN KEY (book_id) REFERENCES knjiga(id) ); ")
 
 cur.execute("CREATE TABLE uporabnik ( "
       + " id SERIAL PRIMARY KEY, "
@@ -84,7 +105,13 @@ cur.execute("CREATE TABLE uporabnik ( "
       + " naslov TEXT); ")
 
 cur.execute("CREATE TABLE zanri ( "
-      + " book_id INTEGER, "
-      + " zanr TEXT ); ")
+      + " book_id INTEGER NOT NULL, "
+      + " zanr TEXT, "
+      + " FOREIGN KEY (book_id) REFERENCES knjiga(id) ); ")
+
+cur.execute("CREATE TABLE liki ( "
+      + " book_id INTEGER NOT NULL, "
+      + " lik TEXT, "
+      + " FOREIGN KEY (book_id) REFERENCES knjiga(id) ); ")
 
 print("KONČANO BREZ NAPAK")
