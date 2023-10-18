@@ -2,7 +2,30 @@
 % rebase('base.html', napaka = napaka, naslov = 'Brskalnik')
 
 
+
 <html>
+<head>
+	<style>
+		form  {
+			margin: 60px 0 0 0 !important;
+		 }
+		 
+		.ui-slider .ui-btn-inner {
+			padding: 4px 0 0 0 !important;
+		}
+		 
+		.ui-slider-popup {
+			position: absolute !important;
+			width: 64px;
+			height: 64px;
+			text-align: center;
+			font-size: 36px;
+			padding-top: 14px;
+			z-index: 100;
+			opacity: 0.8;
+		}
+	</style>
+</head>
 <body>
 
 <table style="width:100%;">
@@ -22,10 +45,11 @@
 					<th>ŽANR</th>
 				</tr>    
 
-				%for (id, naslov, avtor_id, ocena, stevilo_ocen, leto_izdaje, jezik) in knjige:
+	
+				%for (ime_avtor, id, naslov, avtor_id, ocena, stevilo_ocen, leto_izdaje, jezik) in knjige:
 				<tr id={{id}}>
 					<td class="naslovClass" id=naslov_{{id}}>{{naslov}}</td>
-					<td>{{avtor_id}}</td>
+					<td>{{ime_avtor}}</td>
 					<td>{{ocena}}</td>
 					<td>{{leto_izdaje}}</td>
 					<td>{{jezik}}</td>
@@ -44,12 +68,23 @@
 					<p style="float:left">Ime: <input type="text" name="name" value="d"></p>
 				</div>
 				<div style="float:left">
+					<p style="float:left">Avtor_idxxx: <input type="text" name="avtor_id" value="1"></p>
+				</div>
+				<div style="float:left">
 					Leto: 
 					<select name="year" id="year" >
+						<option value="all">Vsi</option>
 					%for (leto_izdaje) in filterYearKnjige:
 							<option value={{leto_izdaje}}>{{leto_izdaje}}</option>
 					%end
 					</select>
+				</div>
+				<!-- TODO jquery slider range -->
+				<div data-role="rangeslider">
+					<label for="range-1a">Rangeslider:</label>
+					<input type="range" name="range-1a" id="range-1a" min="0" max="100" value="40" data-popup-enabled="true" data-show-value="true">
+					<label for="range-1b">Rangeslider:</label>
+					<input type="range" name="range-1b" id="range-1b" min="0" max="100" value="80" data-popup-enabled="true" data-show-value="true">
 				</div>
 				<div>
 					<p><input type="submit" value="Brskaj"></p>
