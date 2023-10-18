@@ -1,13 +1,13 @@
-uporabnik_id;ime;priimek;username;email;geslo;starost;naslov
-1;Filip;Novak;fnovak;filip.novak@gmail.com;gregw3;35;Jakčeva ulica 34, 8000 Novo mesto
-2;Franc;Kolenc;fkolenc;franc.kolenc@gmail.com;grFFEf452;67;Sketova 10, 1000 Ljubljana
-3;Ema;Jezek;jezekema;ema.jezek@gmail.com;kj34gd;18;Župančičeva 25, 1230 Domžale
-4;Matija;Jezernik;j_matija;matija.jezernik@gmail.com;jh32hh;25;Žolgarjeva ulica 53, 2310 Slovenska Bistrica
-5;Ana;Oplot;a_oplot;anaoplot@gmail.com;jhihi43;28;Koresova ulica 5, 2000 Maribor
-6;Sabina;Vodošek;sabVodosek;sab.vodosek@gmail.com;theet78;35;Slovenska ulica 23, 9000 Murska Sobota
-7;Rok;Čas;rokCas;rok.cas@gmail.com;refrw44;23;Kolodvorska cesta 2, 6000 Koper
-8;Anže;Petrovič;anze_p;anze.petrovic@gmail.com;regege6;45;Bevkova ulica 10, 5270 Ajdovščina
-9;Tanja;Mihelc;tanjamihelc;tanja.mihelc@gmail.com;hr435h;42;Beblerjeva ulica 23, 5280 Idrija
-10;Matic;Trogar;trogmat;matic.trogar@gmail.com;jzhgr56;38;Vackova ulica 26, 4264 Bohinjska Bistrica
-11;Kaja;Rek;kajaRek;kajarek@gmail.com;ikjhgf5;28;Cesta Františka Foita 4, 3320 Velenje
-12;Lena;Petek;lena_petek;lena.petek@gmail.com;kut34zh;56;Pri Unionu 32, 1330 Kočevje
+ime;priimek;username;email;geslo;starost;naslov
+Filip;Novak;fnovak;filip.novak@gmail.com;gregw3;1984-12-03;Jakčeva ulica 34, 8000 Novo mesto
+Franc;Kolenc;fkolenc;franc.kolenc@gmail.com;grFFEf452;1968-03-24;Sketova 10, 1000 Ljubljana
+Ema;Jezek;jezekema;ema.jezek@gmail.com;kj34gd;2002-05-15;Župančičeva 25, 1230 Domžale
+Matija;Jezernik;j_matija;matija.jezernik@gmail.com;jh32hh;1998-11-20;Žolgarjeva ulica 53, 2310 Slovenska Bistrica
+Ana;Oplot;a_oplot;anaoplot@gmail.com;jhihi43;1981-01-24;Koresova ulica 5, 2000 Maribor
+Sabina;Vodošek;sabVodosek;sab.vodosek@gmail.com;theet78;1991-03-05;Slovenska ulica 23, 9000 Murska Sobota
+Rok;Čas;rokCas;rok.cas@gmail.com;refrw44;1994-06-08;Kolodvorska cesta 2, 6000 Koper
+Anže;Petrovič;anze_p;anze.petrovic@gmail.com;regege6;1967-03-29;Bevkova ulica 10, 5270 Ajdovščina
+Tanja;Mihelc;tanjamihelc;tanja.mihelc@gmail.com;hr435h;1959-11-04;Beblerjeva ulica 23, 5280 Idrija
+Matic;Trogar;trogmat;matic.trogar@gmail.com;jzhgr56;1976-10-20;Vackova ulica 26, 4264 Bohinjska Bistrica
+Kaja;Rek;kajaRek;kajarek@gmail.com;ikjhgf5;1995-03-20;Cesta Františka Foita 4, 3320 Velenje
+Lena;Petek;lena_petek;lena.petek@gmail.com;kut34zh;1986-09-25;Pri Unionu 32, 1330 Kočevje
