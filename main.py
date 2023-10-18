@@ -184,15 +184,22 @@ def brskalnik_get():
     oseba = preveriUporabnika()
     napaka = nastaviSporocilo()
 
-    
-    
+    tester = """
+        SELECT a.ime_avtor as ime_avtor, k.id as id, k.naslov as naslov, k.avtor_id as avtor_id, k.ocena as ocena, k.stevilo_ocen as stevilo_ocen, EXTRACT('year' FROM k.leto_izdaje) as leto_izdaje
+        , k.jezik as jezik FROM knjiga k
+        LEFT JOIN avtor a ON a.avtor_id = k.avtor_id
+        ORDER BY leto_izdaje
+    """
+
     knjige = cur.execute("""
-        SELECT id, naslov, avtor_id, ocena, stevilo_ocen, EXTRACT('year' FROM leto_izdaje), jezik FROM knjiga ORDER BY EXTRACT('year' FROM leto_izdaje)
+        SELECT a.ime_avtor, k.id, k.naslov, k.avtor_id, k.ocena, k.stevilo_ocen, EXTRACT('year' FROM k.leto_izdaje), k.jezik FROM knjiga k
+        LEFT JOIN avtor a ON a.avtor_id = k.avtor_id
+        ORDER BY EXTRACT('year' FROM k.leto_izdaje)
     """)
     knjige = cur.fetchall()
 
     query = """
-     SELECT DISTINCT EXTRACT('year' FROM leto_izdaje) as leto_izdaje FROM knjiga ORDER BY leto_izdaje
+         SELECT DISTINCT EXTRACT('year' FROM leto_izdaje) as leto_izdaje FROM knjiga ORDER BY leto_izdaje
      """
 
     filterYearKnjige = cur.execute(query)
@@ -201,6 +208,7 @@ def brskalnik_get():
     results=[]
     for item in filterYearKnjige:
         results.append(item[0])
+
     
     return template('brskalnik.html', napaka=napaka, knjige = knjige, filterYearKnjige = results, noMenu='false')
 
@@ -210,22 +218,30 @@ def brskalnik():
 
     name = request.forms.name + ""
     year = request.forms.year
+    avtor_id = request.forms.avtor_id
     oseba = preveriUporabnika()
     napaka = nastaviSporocilo()
 
-    query = """SELECT id, naslov, avtor_id, ocena, stevilo_ocen, EXTRACT('year' FROM leto_izdaje) as leto_izdaje, jezik FROM knjiga """
+    query = """SELECT a.ime_avtor as ime_avtor, k.id as id, k.naslov as naslov, k.avtor_id as avtor_id, k.ocena as ocena, k.stevilo_ocen as stevilo_ocen, EXTRACT('year' FROM k.leto_izdaje) as leto_izdaje
+        , k.jezik as jezik FROM knjiga k
+        LEFT JOIN avtor a ON a.avtor_id = k.avtor_id
+        """
 
     appendWhere = False
 
-    dolzina = len(name)
+    dolzina_name = len(name)
 
-    if dolzina > 0:
+    if dolzina_name > 0:
         query += " WHERE naslov = "+ " '"+ name +"' "
         appendWhere = True
+
+
+    if appendWhere:
+        query += " AND  k.avtor_id = "+ avtor_id
+    else:
+        appendWhere = True
+        query += " WHERE k.avtor_id = "+ avtor_id
     
-##    if len(name) > 0:
-##        query += " WHERE name= "+name
-##        appendWhere = True
 
     if year != 'all':
         if appendWhere:
@@ -245,6 +261,8 @@ def brskalnik():
     results=[]
     for item in filterYearKnjige:
         results.append(item[0])
+
+    
     
     return template('brskalnik.html', napaka=napaka, knjige = knjige, filterYearKnjige = results, noMenu='false')
 
