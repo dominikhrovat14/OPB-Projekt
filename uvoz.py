@@ -122,8 +122,9 @@ def uvozi_lastnosti(cur):
         oc = row[7]
         on = row[8]
         lz = row[9]
-        sqlinsert = """INSERT INTO lastnosti (book_id, v_z, z_r, p_s, p_n, d_p, n_n, o_c, o_n, l_z) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-        cur.execute(sqlinsert, (bookId, vz, zr, ps, pn, dp, nn, oc, on, lz,))
+        dolzina = random.randint(50,800)
+        sqlinsert = """INSERT INTO lastnosti (book_id, v_z, z_r, p_s, p_n, d_p, n_n, o_c, o_n, l_z, dolzina) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+        cur.execute(sqlinsert, (bookId, vz, zr, ps, pn, dp, nn, oc, on, lz, dolzina,))
 
 
 # ____________________________________________________________________________________________________________#
