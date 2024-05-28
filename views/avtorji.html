@@ -1,0 +1,60 @@
+% setdefault(napaka, '')
+% rebase('base.html', napaka = napaka, naslov = 'Avtorji')
+
+<html>
+<head>
+	<style>
+		form  {
+			margin: 60px 0 0 0 !important;
+		 }
+		 
+		.ui-slider .ui-btn-inner {
+			padding: 4px 0 0 0 !important;
+		}
+		 
+		.ui-slider-popup {
+			position: absolute !important;
+			width: 64px;
+			height: 64px;
+			text-align: center;
+			font-size: 36px;
+			padding-top: 14px;
+			z-index: 100;
+			opacity: 0.8;
+		}
+	</style>
+</head>
+<body>
+
+<table style="width:100%;">
+    <tr>
+        <th>ID</th>
+        <th>AVTOR</th>
+    </tr>
+    
+    %for (avtor_id, ime_avtor) in avtorji:
+        <tr>
+            <td>{{avtor_id}}</td>
+            <td>{{ime_avtor}}</td>
+        </tr>
+    %end
+    
+</table>
+
+<script>
+
+
+	var tab = document.getElementById("tableData");
+	document.getElementById("secondColumn").appendChild(tab);
+	
+	var formData = document.getElementById("formData");
+	document.getElementById("firstColumn").appendChild(formData);
+	
+	
+	
+</script>
+
+
+
+</body>
+</html>

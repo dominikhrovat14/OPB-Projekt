@@ -285,6 +285,21 @@ def moje_knjige_get():
 
 
 #___________________________________________________________________________________________________________________________
+# ENA SAMA KNJIGA
+# todo 
+@get('/avtorji')
+def avtorji():
+    napaka = nastaviSporocilo()
+    query = """SELECT avtor.avtor_id as avtor_id, avtor.ime_avtor as ime_avtor from avtor"""
+    avtorji = cur.execute(query)
+    avtorji = cur.fetchall()
+    return template('avtorji.html', napaka = napaka, avtorji=avtorji, noMenu='false')
+#___________________________________________________________________________________________________________________________
+# O AVTORJU
+#
+
+
+#___________________________________________________________________________________________________________________________
 #POVEZAVA NA BAZO
 
 db="sem2023_milkag"
