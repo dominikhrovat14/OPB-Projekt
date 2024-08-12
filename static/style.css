@@ -11,22 +11,29 @@ font-size: 20px;
 .zacetni_gumb {
 
 	font-size : 2.5rem!important;
-	background-color: #F9F9C5!important;
-	border-color: #ffcc80!important;
+	background-color: #dfd3eb!important;
+	border-color: grey!important;
 	color : black!important;
-	
+	transition: all 0.1s linear;
 }
 
+.zacetni_gumb:hover{
+
+	 background-color: #b2a5d4!important;
+	 transform: scale(1.1);
+	 
+}
+
+<!-- za klik -->
 .zacetni_gumb:hover a{
 
-	 background-color: #b5f18e;
-	
+	 background-color: #b2a5d4;
 }
 
 .orodna_vrstica{
 	
 
-	background-color: #D9F8C4;	
+	background-color: #dfd3eb;	
 	
 }
 
@@ -36,6 +43,6 @@ body {
 
 
 .navbar a:hover, .dropdown:hover .dropbtn {
-  background-color: #b5f18e;
+  background-color: #b2a5d4;
 }
 

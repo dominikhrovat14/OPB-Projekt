@@ -184,88 +184,182 @@ def brskalnik_get():
     oseba = preveriUporabnika()
     napaka = nastaviSporocilo()
 
-    tester = """
-        SELECT a.ime_avtor as ime_avtor, k.id as id, k.naslov as naslov, k.avtor_id as avtor_id, k.ocena as ocena, k.stevilo_ocen as stevilo_ocen, EXTRACT('year' FROM k.leto_izdaje) as leto_izdaje
-        , k.jezik as jezik FROM knjiga k
-        LEFT JOIN avtor a ON a.avtor_id = k.avtor_id
-        ORDER BY leto_izdaje
-    """
-
     knjige = cur.execute("""
-        SELECT a.ime_avtor, k.id, k.naslov, k.avtor_id, k.ocena, k.stevilo_ocen, EXTRACT('year' FROM k.leto_izdaje), k.jezik FROM knjiga k
+        SELECT a.ime_avtor, k.id, k.naslov, k.avtor_id, k.ocena,
+        k.stevilo_ocen, EXTRACT('year' FROM k.leto_izdaje), k.jezik, l.dolzina as dolzina
+        FROM knjiga k
         LEFT JOIN avtor a ON a.avtor_id = k.avtor_id
+        LEFT JOIN lastnosti l ON l.book_id = k.id
         ORDER BY EXTRACT('year' FROM k.leto_izdaje)
     """)
     knjige = cur.fetchall()
 
-    query = """
+    queryYear = """
          SELECT DISTINCT EXTRACT('year' FROM leto_izdaje) as leto_izdaje FROM knjiga ORDER BY leto_izdaje
      """
 
-    filterYearKnjige = cur.execute(query)
+    filterYearKnjige = cur.execute(queryYear)
     filterYearKnjige = cur.fetchall()
 
     results=[]
     for item in filterYearKnjige:
         results.append(item[0])
 
+    queryLanguage = """
+         SELECT DISTINCT jezik FROM knjiga ORDER BY jezik 
+     """
+
+    filterLanguageKnjige = cur.execute(queryLanguage)
+    filterLanguageKnjige = cur.fetchall()
+
+    resultsLanguage=[]
+    for item in filterLanguageKnjige:
+        resultsLanguage.append(item[0])
+
     
-    return template('brskalnik.html', napaka=napaka, knjige = knjige, filterYearKnjige = results, noMenu='false')
+    return template('brskalnik.html', napaka=napaka, knjige = knjige, filterYearKnjige = results, filterLanguageKnjige = filterLanguageKnjige, noMenu='false')
 
 
 @post('/brskalnik')
 def brskalnik():
 
-    name = request.forms.name + ""
+    name = request.forms.name
     year = request.forms.year
-    avtor_id = request.forms.avtor_id
+    from_year, to_year = year.split(" - ")
+    avtor = request.forms.avtor
     oseba = preveriUporabnika()
     napaka = nastaviSporocilo()
 
-    query = """SELECT a.ime_avtor as ime_avtor, k.id as id, k.naslov as naslov, k.avtor_id as avtor_id, k.ocena as ocena, k.stevilo_ocen as stevilo_ocen, EXTRACT('year' FROM k.leto_izdaje) as leto_izdaje
-        , k.jezik as jezik FROM knjiga k
-        LEFT JOIN avtor a ON a.avtor_id = k.avtor_id
-        """
+    query = """
+            SELECT a.ime_avtor, k.id, k.naslov, k.avtor_id, k.ocena,
+            k.stevilo_ocen, EXTRACT('year' FROM k.leto_izdaje) as leto_izdaje, k.jezik, l.dolzina as dolzina
+            FROM knjiga k
+            LEFT JOIN avtor a ON a.avtor_id = k.avtor_id
+            LEFT JOIN lastnosti l ON l.book_id = k.id
+        
+            """
 
     appendWhere = False
 
-    dolzina_name = len(name)
-
-    if dolzina_name > 0:
-        query += " WHERE naslov = "+ " '"+ name +"' "
-        appendWhere = True
-
-
-    if appendWhere:
-        query += " AND  k.avtor_id = "+ avtor_id
-    else:
-        appendWhere = True
-        query += " WHERE k.avtor_id = "+ avtor_id
-    
-
-    if year != 'all':
+    if len(name) > 0:
         if appendWhere:
-            query += " AND  EXTRACT('year' FROM leto_izdaje) = "+ year
+            if '*' in name:
+                name = name.replace('*', '%')
+                query += " AND k.naslov LIKE '" + name + "'"
+            else:
+                query += " AND  k.naslov= '""" + name + """'"""
         else:
             appendWhere = True
-            query += " WHERE EXTRACT('year' FROM leto_izdaje) = "+ year
+            if '*' in name:
+                name = name.replace('*', '%')
+                query += " WHERE k.naslov LIKE '" + name + "'"
+            else:
+                query += " WHERE k.naslov = '""" + name + """'"""
+                
+    if len(avtor) > 0:
+        if appendWhere:
+            if '*' in avtor:
+                avtor = avtor.replace('*', '%')
+                query += " AND a.ime_avtor LIKE '" + avtor + "'"
+            else:
+                query += " AND  a.ime_avtor= '""" + avtor + """'"""
+        else:
+            appendWhere = True
+            if '*' in avtor:
+                avtor = avtor.replace('*', '%')
+                query += " WHERE a.ime_avtor LIKE '" + avtor + "'"
+            else:
+                query += " WHERE a.ime_avtor = '""" + avtor + """'"""
 
+
+    if len(year) > 0:
+        if appendWhere:
+            query += " AND  EXTRACT('year' FROM k.leto_izdaje) >= " +from_year + " AND EXTRACT('year' FROM k.leto_izdaje) <= " +to_year 
+                     
+        else:
+            appendWhere = True
+            query += " WHERE  EXTRACT('year' FROM k.leto_izdaje) >= " +from_year + " AND EXTRACT('year' FROM k.leto_izdaje) <= " +to_year 
+                     
+
+    query +=  "ORDER BY EXTRACT('year' FROM k.leto_izdaje)"
     knjige = cur.execute(query)
     knjige = cur.fetchall()
 
-    
-    filterYearKnjige = cur.execute("""
-     SELECT DISTINCT EXTRACT('year' FROM leto_izdaje) as leto_izdaje FROM knjiga ORDER BY leto_izdaje
-     """)
+    queryYear = """
+             SELECT DISTINCT EXTRACT('year' FROM leto_izdaje) as leto_izdaje FROM knjiga ORDER BY leto_izdaje
+     """
+
+    filterYearKnjige = cur.execute(queryYear)
     filterYearKnjige = cur.fetchall()
+
     results=[]
     for item in filterYearKnjige:
-        results.append(item[0])
+            results.append(item[0])
 
-    
-    
-    return template('brskalnik.html', napaka=napaka, knjige = knjige, filterYearKnjige = results, noMenu='false')
+    queryLanguage = """
+             SELECT DISTINCT jezik FROM knjiga ORDER BY jezik 
+     """
 
+    filterLanguageKnjige = cur.execute(queryLanguage)
+    filterLanguageKnjige = cur.fetchall()
+
+    resultsLanguage=[]
+    for item in filterLanguageKnjige:
+            resultsLanguage.append(item[0])
+
+
+    return template('brskalnik.html', napaka=napaka, knjige = knjige, filterYearKnjige = results, filterLanguageKnjige = filterLanguageKnjige, noMenu='false')
+#___________________________________________________________________________________________________________________________
+# O KNJIGI
+#TODO
+#PRIJAVA
+@get('/knjiga')
+def knjiga_get():
+    napaka = nastaviSporocilo()
+    book_id = request.query['book_id']
+    knjige = cur.execute("""
+        SELECT a.ime_avtor as avtor, k.naslov as naslov, k.avtor_id as avtor_id, k.ocena as ocena,
+        k.stevilo_ocen as stevilo_ocen, EXTRACT('year' FROM k.leto_izdaje) as leto, k.jezik as jezik 
+        FROM knjiga k
+        LEFT JOIN avtor a ON a.avtor_id = k.avtor_id
+        WHERE k.id = """ + book_id)
+    knjiga_info = cur.fetchall()
+
+    knjige_last = cur.execute("""
+        SELECT vesela, zabavna, prijetna, predvidljiva, domisljijska, cudovita,
+        optimisticna, neeroticna, lahkotna, dolzina FROM lastnosti
+        WHERE book_id = """ + book_id)
+    knjiga_lastnosti = cur.fetchall()
+
+    return template('knjiga.html', napaka=napaka, knjiga_info = knjiga_info, knjiga_lastnosti = knjiga_lastnosti, noMenu='true')
+
+@post('/knjiga')
+def knjiga_post():
+    username = request.forms.username
+    geslo = request.forms.password
+    
+    if username is None or geslo is None:
+        nastaviSporocilo('Uporabniško ime in geslo morata biti neprazna') 
+        redirect(url('prijava_get'))   
+    hgeslo = None
+    try: 
+        cur.execute("SELECT geslo FROM uporabnik WHERE username = %s", (username, ))
+        hgeslo, = cur.fetchone()
+    except:
+        hgeslo = None
+    if hgeslo is None:
+        nastaviSporocilo('Uporabniško ime ali geslo nista ustrezni') 
+        redirect(url('prijava_get'))
+        return
+    if geslo != hgeslo:
+        nastaviSporocilo('Uporabniško ime ali geslo nista ustrezni') 
+        redirect(url('prijava_get'))
+        return
+    response.set_cookie('username', username, path="/", secret=skrivnost)
+    redirect(url('uporabnik'))
+
+#_______________________________________________________________________________________________________________________
+# ENA SAMA KNJIGA
 
 
 

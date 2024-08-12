@@ -1,8 +1,6 @@
 % setdefault(napaka, '')
 % rebase('base.html', napaka = napaka, naslov = 'Brskalnik')
 
-
-
 <html>
 <head>
 	<style>
@@ -24,92 +22,234 @@
 			z-index: 100;
 			opacity: 0.8;
 		}
-	</style>
-</head>
-<body>
-
-<table style="width:100%;">
-
-	<tr>
-		<td id="firstColumn" style="vertical-align:top">
 		
-			<table id="tableData">
+		
+		
+		
+		@charset "UTF-8";
+		@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
+
+		h1 {
+		  font-size:3em; 
+		  font-weight: 300;
+		  line-height:1em;
+		  text-align: center;
+		  color: #4DC3FA;
+		}
 
 
-				<tr>
-					<th>NASLOV</th>
-					<th>AVTOR</th>
-					<th>OCENA</th>
-					<th>LETO IZDAJE</th>
-					<th>DOLŽINA</th>
-					<th>ŽANR</th>
-				</tr>    
+		.blue { color: #185875; }
+		.yellow { color: #FFF842; }
 
+		.container_table th h1 {
+			font-weight: bold;
+			font-size: 14px;
+		  text-align: left;
+		  color: #185875;
+		}
+
+		.container_table td {
+			font-weight: normal;
+			font-size: 12px;
+		  -webkit-box-shadow: 0 2px 2px -2px #0E1119;
+			 -moz-box-shadow: 0 2px 2px -2px #0E1119;
+				  box-shadow: 0 2px 2px -2px #0E1119;
+		}
+
+		.container_table {
+			text-align: left;
+			overflow: hidden;
+			width: 80%;
+			margin: 0 auto;
+		  display: table;
+		  padding: 0 0 8em 0;
+		}
+
+		.container_table td, .container_table th {
+			padding-bottom: 2%;
+			padding-top: 2%;
+		  padding-left:2%;  
+		}
+
+		/* Background-color of the odd rows */
+		.container_table tr:nth-child(odd) {
+			background-color: white;
+		}
+
+		/* Background-color of the even rows */
+		.container_table tr:nth-child(even) {
+			background-color: #dfd3eb;	
+		}
+		.filterDiv{
+		
+			text-align:left;
+			padding-bottom:20px;
+			
+		}
+		.slider-container {
+            width: 300px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .range-values {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        input[type="range"] {
+            width: 100%;
+            appearance: none;
+            background: #ddd;
+        }
+        input[type="range"]:focus {
+            outline: none;
+        }
+		.table_th{
+		
+			font-size:16px;
+		
+		}
+		.naslovClass{
+		
+			cursor:pointer;
+			transition: background-color 0.3s ease; /* Smooth transition */
+		}
+		 .naslovClass:hover {
+            background-color: #b2a5d4!important; /* Color on hover */
+        }
+		
+		.tableRounded {
+			border-collapse: collapse;
+			border-radius: 30px;
+			border-style: hidden; /* hide standard table (collapsed) border */
+			box-shadow: 0 0 0 0.1px #666; /* this draws the table border  */ 
+		}
+
+	</style>
 	
-				%for (ime_avtor, id, naslov, avtor_id, ocena, stevilo_ocen, leto_izdaje, jezik) in knjige:
-				<tr id={{id}}>
-					<td class="naslovClass" id=naslov_{{id}}>{{naslov}}</td>
-					<td>{{ime_avtor}}</td>
-					<td>{{ocena}}</td>
-					<td>{{leto_izdaje}}</td>
-					<td>{{jezik}}</td>
-				</tr>
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+	<script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
+	
+	<script>
+	
+		var bookDataRedirect = function(book_id){
+			
+			window.location.replace("http://127.0.0.1:8080/knjiga?book_id="+book_id);
+		
+		}
+	
+        $(function() {
+			$(document).ready(function() {
+				
+				//Zacnetni vrednosti
+				var min_leto = 1900;
+				var max_leto = 2023;
+
+				var first_ = false;
+				//TODO BREZ ZANKE
+				%for (leto_izdaje) in filterYearKnjige:
+					
+					if (first_){
+					
+						first_ = true;
+						min_leto = {{leto_izdaje}};
+					}
+					max_leto = {{leto_izdaje}};
+					
+					
 				%end
 
+				$("#slider-range").slider({
+					range: true,
+					min: min_leto,
+					max: max_leto,
+					values: [min_leto, max_leto],
+					slide: function(event, ui) {
+						$("#year").val(ui.values[0] + " - " + ui.values[1]);
+					}
+				});
+				$("#year").val($("#slider-range").slider("values", 0) + 
+                " - " + $("#slider-range").slider("values", 1));
 
-			</table>
+			});
 			
 			
-		</td>
-		<td id="secondColumn" style="vertical-align:top">
 			
-			<form id="formData" action="{{url('brskalnik')}}" method="POST">
-				<div style="float:left">
-					<p style="float:left">Ime: <input type="text" name="name" value="d"></p>
-				</div>
-				<div style="float:left">
-					<p style="float:left">Avtor_idxxx: <input type="text" name="avtor_id" value="1"></p>
-				</div>
-				<div style="float:left">
-					Leto: 
-					<select name="year" id="year" >
-						<option value="all">Vsi</option>
-					%for (leto_izdaje) in filterYearKnjige:
-							<option value={{leto_izdaje}}>{{leto_izdaje}}</option>
+        });
+    </script>
+</head>
+<body>
+	<form id="formData" action="{{url('brskalnik')}}" method="POST">
+	<table style="width:100%;">
+		
+		<tr>
+			<td id="firstColumn" style="vertical-align:top;width:30%;padding:0px 25px 25px 25px">
+			
+				
+					<div class="filterDiv">
+						<label>Naslov: </label>
+						<input type="text" name="name" value="" style="width: 100%;">
+					</div>
+					<div class="filterDiv">
+						<label >Avtor: </label>
+						<input type="text" name="avtor" value="" style="width: 100%;">
+					</div>
+					<div class="filterDiv">
+						<label style="display:block" >Jezik: </label>
+						<select name="language" id="language" style="width: 100%;">
+							<option value="all">Vsi</option>
+						%for (jezik) in filterLanguageKnjige:
+								<option value={{jezik}}>{{jezik}}</option>
+						%end
+						</select>
+					</div>
+
+					<!-- jquery slider range -->
+					<div class="filterDiv">
+					<label>Leto</label>
+						<div id="slider-range"></div>
+						<input name="year" type="text" id="year" readonly="" style="border:0;">
+					</div>
+					<div class="filterDiv" style="margin-top:40px;text-align:center;">
+						<p><input class="zacetni_gumb btn btn-primary" type="submit" value="Brskaj"></p>
+					</div>
+				
+			</td>
+			<td id="secondColumn" style="vertical-align:top;width:70%">
+				
+				<table class="container_table tableRounded" id="tableData">
+
+
+					<tr>
+						<th class="table_th">NASLOV</th>
+						<th class="table_th">AVTOR</th>
+						<th class="table_th">OCENA</th>
+						<th class="table_th">LETO</th>
+						<th class="table_th">JEZIK</th>
+						<th class="table_th">DOLŽINA</th>
+					</tr>    
+
+		
+					%for (ime_avtor, id, naslov, avtor_id, ocena, stevilo_ocen, leto_izdaje, jezik, dolzina) in knjige:
+					<tr id={{id}}>
+						<td title="Podrobni pregled" class="naslovClass" id=naslov_{{id}} onclick="bookDataRedirect({{id}})">{{naslov}}</td>
+						<td>{{ime_avtor}}</td>
+						<td>{{ocena}}</td>
+						<td>{{leto_izdaje}}</td>
+						<td>{{jezik}}</td>
+						<td>{{dolzina}}</td>
+					</tr>
 					%end
-					</select>
-				</div>
-				<!-- TODO jquery slider range -->
-				<div data-role="rangeslider">
-					<label for="range-1a">Rangeslider:</label>
-					<input type="range" name="range-1a" id="range-1a" min="0" max="100" value="40" data-popup-enabled="true" data-show-value="true">
-					<label for="range-1b">Rangeslider:</label>
-					<input type="range" name="range-1b" id="range-1b" min="0" max="100" value="80" data-popup-enabled="true" data-show-value="true">
-				</div>
-				<div>
-					<p><input type="submit" value="Brskaj"></p>
-				</div>
-			</form>
-		
-		</td>
-		
-	</tr>
-</table>
-
-<script>
 
 
-	var tab = document.getElementById("tableData");
-	document.getElementById("secondColumn").appendChild(tab);
-	
-	var formData = document.getElementById("formData");
-	document.getElementById("firstColumn").appendChild(formData);
-	
-	
-	
-</script>
-
-
+				</table>
+			
+			</td>
+			
+		</tr>
+	</table>
+	</form>
 
 </body>
 </html>

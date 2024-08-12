@@ -1,0 +1,149 @@
+% setdefault('napaka', '')
+% setdefault('naslov', 'Lastnosti')
+% rebase('base.html', napaka=napaka, naslov=naslov, knjiga_info=knjiga_info, knjiga_lastnosti = knjiga_lastnosti, noMenu='true')
+
+<html>
+<head>
+	<style>
+			form  {
+				margin: 60px 0 0 0 !important;
+			 }
+			 
+			.ui-slider .ui-btn-inner {
+				padding: 4px 0 0 0 !important;
+			}
+			 
+			.ui-slider-popup {
+				position: absolute !important;
+				width: 64px;
+				height: 64px;
+				text-align: center;
+				font-size: 36px;
+				padding-top: 14px;
+				z-index: 100;
+				opacity: 0.8;
+			}
+			.slider-color{
+			
+				background-color:#dfd3eb!important;
+			
+			}
+			
+	</style>
+
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+	<script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
+	
+	<script>
+	
+        $(function() {
+			$(document).ready(function() {
+				
+				//Zacnetni vrednosti
+				var vesela_val = 0;
+				var zabavna_val = 0;
+	
+				//TODO BREZ ZANKE
+				%for (vesela, zabavna, prijetna, predvidljiva, domisljijska, cudovita, optimisticna, neeroticna, lahkotna, dolzina) in knjiga_lastnosti:
+			
+					vesela_val = {{vesela}};
+					zabavna_val = {{zabavna}}
+				
+				%end
+	
+				 $("#slider-range-vesela").slider({
+					value: vesela_val, // Initial value
+					min: 0, // Minimum value
+					max: 100, // Maximum value
+					step: 1, // Step value
+					slide: function(event, ui) {
+						// Update the slider value display when sliding
+						$("#vesela").text(ui.value);
+					}
+				});
+				$("#slider-range-vesela").slider("option", "disabled", true);
+				
+				$("#slider-range-zabavna").slider({
+					value: zabavna_val, // Initial value
+					min: 0, // Minimum value
+					max: 100, // Maximum value
+					step: 1, // Step value
+					slide: function(event, ui) {
+						// Update the slider value display when sliding
+						$("#zabavna").text(ui.value);
+					}
+				});
+				$("#slider-range-zabavna").slider("option", "disabled", true);
+				
+	
+			});
+			
+			
+			
+        });
+    </script>
+
+</head>
+<body>
+<form action="{{url('knjiga_get')}}" method="post" autocomplete="off">
+	
+	<!-- tu ne rabim for zanke, ker je samo ena vrednost -->
+	<table style="float:left">
+		<tr>
+			<td style="text-align:left">
+			%for (avtor, naslov, avtor_id, ocena, stevilo_ocen, leto, jezik) in knjiga_info:
+			
+				<h1> {{naslov}} </h1>
+				<h3> {{avtor}} </h3>
+				<img src="{{url('static', filename= '/img/lord_jim.jpg')}}" alt="" width="200" height="300">
+	
+			%end
+			</td>
+			
+			
+			
+			<td style="margin-left:100px;padding:10px;float:left">
+			
+			%for (vesela, zabavna, prijetna, predvidljiva, domisljijska, cudovita, optimisticna, neeroticna, lahkotna, dolzina) in knjiga_lastnosti:
+				
+				<div>
+					<table>
+						<tr>
+							<td>
+							Vesela
+							</td>
+							<td style="padding-top:30px">
+							<div id="slider-range-vesela" class="slider-color"></div>
+								<input type="text" id="vesela" readonly="" style="border:0;">
+							
+							</td>
+							<td>
+							Žalostna
+							</td>
+						</tr>
+						
+						<tr>
+							<td>
+							Zabavna
+							</td>
+							<td style="padding-top:30px">
+							<div id="slider-range-zabavna" class="slider-color"></div>
+								<input type="text" id="zabavna" readonly="" style="border:0;">
+							
+							</td>
+							<td>
+							Dolgočasna
+							</td>
+						</tr>
+					</table>
+				</div>
+			
+			%end
+			
+			</td>
+		</tr>	
+	</table>
+</form>
+</body>
+</html>
