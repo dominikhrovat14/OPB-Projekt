@@ -214,10 +214,11 @@ def brskalnik_get():
 
     resultsLanguage=[]
     for item in filterLanguageKnjige:
-        resultsLanguage.append(item[0])
+        if len(item[0])>0:
+            resultsLanguage.append(item[0])
 
     
-    return template('brskalnik.html', napaka=napaka, knjige = knjige, filterYearKnjige = results, filterLanguageKnjige = filterLanguageKnjige, noMenu='false')
+    return template('brskalnik.html', napaka=napaka, knjige = knjige, filterYearKnjige = results, filterLanguageKnjige = resultsLanguage, noMenu='false')
 
 
 @post('/brskalnik')
@@ -227,6 +228,7 @@ def brskalnik():
     year = request.forms.year
     from_year, to_year = year.split(" - ")
     avtor = request.forms.avtor
+    jezik = request.forms.language
     oseba = preveriUporabnika()
     napaka = nastaviSporocilo()
 
@@ -270,7 +272,12 @@ def brskalnik():
                 query += " WHERE a.ime_avtor LIKE '" + avtor + "'"
             else:
                 query += " WHERE a.ime_avtor = '""" + avtor + """'"""
-
+    if len(jezik) > 0 and jezik != 'all':
+        if appendWhere:
+            query += " AND  k.jezik = '""" + jezik + """'"""
+        else:
+            appendWhere = True
+            query += " WHERE  k.jezik = '""" + jezik + """'"""
 
     if len(year) > 0:
         if appendWhere:
@@ -305,10 +312,11 @@ def brskalnik():
 
     resultsLanguage=[]
     for item in filterLanguageKnjige:
+        if len(item[0])>0:
             resultsLanguage.append(item[0])
 
 
-    return template('brskalnik.html', napaka=napaka, knjige = knjige, filterYearKnjige = results, filterLanguageKnjige = filterLanguageKnjige, noMenu='false')
+    return template('brskalnik.html', napaka=napaka, knjige = knjige, filterYearKnjige = results, filterLanguageKnjige = resultsLanguage, noMenu='false')
 #___________________________________________________________________________________________________________________________
 # O KNJIGI
 #TODO
