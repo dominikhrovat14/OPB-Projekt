@@ -1,6 +1,6 @@
 % setdefault('napaka', '')
 % setdefault('naslov', 'Lastnosti')
-% rebase('base.html', napaka=napaka, naslov=naslov, knjiga_info=knjiga_info, knjiga_lastnosti = knjiga_lastnosti, noMenu='true')
+% rebase('base.html', book_id = book_id, napaka=napaka, naslov=naslov, knjiga_info=knjiga_info, knjiga_lastnosti = knjiga_lastnosti, knjige_komentarji = knjige_komentarji, noMenu='true')
 
 <html>
 <head>
@@ -26,7 +26,32 @@
 			.slider-color{
 			
 				background-color:#dfd3eb!important;
+				width:250px;
 			
+			}
+			.star-rating {
+				display: inline-block;
+				font-size: 2rem;
+				color: #ddd;
+				cursor: pointer;
+				float:left;
+			}
+			.star-rating .star {
+				color: gold;
+			}
+			.starSelected {
+				color: gold;
+				display: inline-block;
+				font-size: 2rem;
+				cursor: pointer;
+				float:left;
+			}
+			.starNotSelected {
+				display: inline-block;
+				font-size: 2rem;
+				color: #ddd;
+				cursor: pointer;
+				float:left;
 			}
 			
 	</style>
@@ -34,21 +59,27 @@
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 	<script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
-	
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 	
         $(function() {
 			$(document).ready(function() {
 				
 				//Zacnetni vrednosti
-				var vesela_val = 0;
-				var zabavna_val = 0;
+				var vesela_val     = 0;
+				var zabavna_val    = 0;
+				var prijetna_val   = 0;
+				var neeroticna_val = 0;
+				var lahkotna_val   = 0;
 	
 				//TODO BREZ ZANKE
 				%for (vesela, zabavna, prijetna, predvidljiva, domisljijska, cudovita, optimisticna, neeroticna, lahkotna, dolzina) in knjiga_lastnosti:
 			
-					vesela_val = {{vesela}};
-					zabavna_val = {{zabavna}}
+					vesela_val 	   = {{vesela}};
+					zabavna_val    = {{zabavna}}
+					prijetna_val   = {{prijetna}}
+					neeroticna_val = {{neeroticna}}
+					lahkotna_val   = {{lahkotna}}
 				
 				%end
 	
@@ -76,12 +107,89 @@
 				});
 				$("#slider-range-zabavna").slider("option", "disabled", true);
 				
-	
+				$("#slider-range-prijetna").slider({
+					value: prijetna_val, // Initial value
+					min: 0, // Minimum value
+					max: 100, // Maximum value
+					step: 1, // Step value
+					slide: function(event, ui) {
+						// Update the slider value display when sliding
+						$("#prijetna").text(ui.value);
+					}
+				});
+				$("#slider-range-prijetna").slider("option", "disabled", true);
+				
+				$("#slider-range-neeroticna").slider({
+					value: neeroticna_val, // Initial value
+					min: 0, // Minimum value
+					max: 100, // Maximum value
+					step: 1, // Step value
+					slide: function(event, ui) {
+						// Update the slider value display when sliding
+						$("#neeroticna").text(ui.value);
+					}
+				});
+				$("#slider-range-neeroticna").slider("option", "disabled", true);
+				
+				$("#slider-range-lahkotna").slider({
+					value: lahkotna_val, // Initial value
+					min: 0, // Minimum value
+					max: 100, // Maximum value
+					step: 1, // Step value
+					slide: function(event, ui) {
+						// Update the slider value display when sliding
+						$("#lahkotna").text(ui.value);
+					}
+				});
+				$("#slider-range-lahkotna").slider("option", "disabled", true);
+				
+				
+				 %for (komentar_id, uporabnik_id, komentar, ocena, refer) in knjige_komentarji:
+					var starsComments = document.querySelectorAll('.star-rating_{{komentar_id}} span');
+
+					starsComments.forEach(star => {
+		   
+						var rating = {{ocena}};
+						
+			
+						// Highlight the selected stars
+						for (let i = 0; i < rating; i++) {
+							starsComments[i].classList.add('starSelected');
+						}
+						for (let i = rating; i <= 4; i++){
+							starsComments[i].classList.add('starNotSelected');
+						}
+
+					});
+				%end	
 			});
 			
-			
-			
         });
+		
+		document.addEventListener('DOMContentLoaded', function () {
+            const stars = document.querySelectorAll('.star-rating span');
+			const ratingValue = document.getElementById('starRating');
+            
+            stars.forEach(star => {
+                star.addEventListener('click', function () {
+                    const rating = this.getAttribute('data-value');
+
+                    stars.forEach(s => s.classList.remove('star'));
+					ratingValue.value = rating;
+
+                    // Highlight the selected stars
+                    for (let i = 0; i < rating; i++) {
+                        stars[i].classList.add('star');
+                    }
+					
+                });
+            });
+		
+         });
+		 
+		
+		
+		
     </script>
 
 </head>
@@ -103,9 +211,9 @@
 			
 			
 			
-			<td style="margin-left:100px;padding:10px;float:left">
+			<td style="margin-top:20px;float:left">
 			
-			%for (vesela, zabavna, prijetna, predvidljiva, domisljijska, cudovita, optimisticna, neeroticna, lahkotna, dolzina) in knjiga_lastnosti:
+			
 				
 				<div>
 					<table>
@@ -113,9 +221,9 @@
 							<td>
 							Vesela
 							</td>
-							<td style="padding-top:30px">
+							<td >
 							<div id="slider-range-vesela" class="slider-color"></div>
-								<input type="text" id="vesela" readonly="" style="border:0;">
+								<input type="text" id="vesela" readonly="" style="border:0;display:none">
 							
 							</td>
 							<td>
@@ -127,23 +235,121 @@
 							<td>
 							Zabavna
 							</td>
-							<td style="padding-top:30px">
+							<td >
 							<div id="slider-range-zabavna" class="slider-color"></div>
-								<input type="text" id="zabavna" readonly="" style="border:0;">
+								<input type="text" id="zabavna" readonly="" style="border:0;display:none">
 							
 							</td>
 							<td>
 							Dolgočasna
 							</td>
 						</tr>
+						
+						<tr>
+							<td>
+							Prijetna
+							</td>
+							<td >
+							<div id="slider-range-prijetna" class="slider-color"></div>
+								<input type="text" id="prijetna" readonly="" style="border:0;display:none">
+							
+							</td>
+							<td>
+							Stresna
+							</td>
+						</tr>
+						
+						<tr>
+							<td>
+							Neerotična
+							</td>
+							<td >
+							<div id="slider-range-neeroticna" class="slider-color"></div>
+								<input type="text" id="neeroticna" readonly="" style="border:0;display:none">
+							
+							</td>
+							<td>
+							Erotična
+							</td>
+						</tr>
+						
+						<tr>
+							<td>
+							Lahkotna
+							</td>
+							<td >
+							<div id="slider-range-lahkotna" class="slider-color"></div>
+								<input type="text" id="lahkotna" readonly="" style="border:0;display:none">
+							</td>
+							<td>
+							Zahtevna
+							</td>
+						</tr>
 					</table>
 				</div>
 			
-			%end
+		
 			
 			</td>
-		</tr>	
+			
+		</tr>
+		<tr>
+
+			<td colspan="2" style="float:left;margin-top:50px;text-align:left;margin-bottom:40px">
+				<h1>Komentarji</h1>
+				<form id="formData" action="{{url('post_comment')}}" method="POST">
+				<input style="display:none" name = "book_id" value={{book_id}}></input>
+				<table>
+					<tr>
+						<td style="float:left">
+							<div class="star-rating">
+								<span data-value="1">&#9733;</span>
+								<span data-value="2">&#9733;</span>
+								<span data-value="3">&#9733;</span>
+								<span data-value="4">&#9733;</span>
+								<span data-value="5">&#9733;</span>
+							</div>
+							<input id="starRating" name="starRating" style="display:none"/>
+							<textarea name="new_comment" style="width:100%" type="text" id="new_comment" placeholder="Dodaj nov komentar"></textarea>
+						</td>
+						
+						<td style="vertical-align:top; text-align:left; padding-left:30px;padding-top:50px;">
+							<div>
+								<p><input style="font-size:14px!important;" class="zacetni_gumb btn btn-primary" type="submit" value="Oceni"></p>
+							</div>
+						</td>
+					</tr>
+				</table>
+				</form>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="float:left;margin-top:50px;text-align:left;margin-bottom:40px">
+			<h1>Komentarji uporabnikov</h1>
+			%for (komentar_id, uporabnik_id, komentar, ocena, refer) in knjige_komentarji:
+				
+				<div style="margin-top:30px">
+				
+					<div class=star-rating_{{komentar_id}}>
+						<span data-value="1">&#9733;</span>
+						<span data-value="2">&#9733;</span>
+						<span data-value="3">&#9733;</span>
+						<span data-value="4">&#9733;</span>
+						<span data-value="5">&#9733;</span>
+					</div>
+					<textarea readonly  style="width:100%" type="text" >{{komentar}}</textarea>
+				
+				</div>
+				
+			
+			%end
+			</td>
+		</tr>
+		
+		
 	</table>
+	
+	
 </form>
 </body>
 </html>

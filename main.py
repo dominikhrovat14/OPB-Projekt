@@ -1,6 +1,15 @@
 #Uvoz Bottla, knjižnica za izdelavo spletne strani
 from re import TEMPLATE
 from bottleext import *
+import logging
+from logging.handlers import RotatingFileHandler
+
+# Set up logging with rotation
+handler = RotatingFileHandler('application.log', maxBytes=2000, backupCount=5)
+logging.basicConfig(
+    handlers=[handler],
+    level=logging.DEBUG
+)
 
 #Uvoz podatkov za povezavo na bazo
 
@@ -56,6 +65,29 @@ def hashGesla(s):
     m = hashlib.sha256()
     m.update(s.encode("utf-8"))
     return m.hexdigest()
+
+def prikaziLastnosti(napaka, book_id):
+    knjige = cur.execute("""
+        SELECT a.ime_avtor as avtor, k.naslov as naslov, k.avtor_id as avtor_id, k.ocena as ocena,
+        k.stevilo_ocen as stevilo_ocen, EXTRACT('year' FROM k.leto_izdaje) as leto, k.jezik as jezik 
+        FROM knjiga k
+        LEFT JOIN avtor a ON a.avtor_id = k.avtor_id
+        WHERE k.id = """ + book_id)
+    knjiga_info = cur.fetchall()
+
+    knjige_last = cur.execute("""
+        SELECT vesela, zabavna, prijetna, predvidljiva, domisljijska, cudovita,
+        optimisticna, neeroticna, lahkotna, dolzina FROM lastnosti
+        WHERE book_id = """ + book_id)
+    knjiga_lastnosti = cur.fetchall()
+
+    knjige_comment = cur.execute("""
+        SELECT komentar_id, uporabnik_id, komentar, ocena, refer
+        FROM ocene_uporabnikov 
+        WHERE book_id = """ + book_id)
+    knjige_komentarji = cur.fetchall()
+
+    return template('knjiga.html', napaka=napaka, book_id = book_id, knjiga_info = knjiga_info, knjiga_lastnosti = knjiga_lastnosti, knjige_komentarji = knjige_komentarji, noMenu='true')
 
 # Mapa za statične vire (slike, css, ...)
 static_dir = "./static"
@@ -325,46 +357,24 @@ def brskalnik():
 def knjiga_get():
     napaka = nastaviSporocilo()
     book_id = request.query['book_id']
-    knjige = cur.execute("""
-        SELECT a.ime_avtor as avtor, k.naslov as naslov, k.avtor_id as avtor_id, k.ocena as ocena,
-        k.stevilo_ocen as stevilo_ocen, EXTRACT('year' FROM k.leto_izdaje) as leto, k.jezik as jezik 
-        FROM knjiga k
-        LEFT JOIN avtor a ON a.avtor_id = k.avtor_id
-        WHERE k.id = """ + book_id)
-    knjiga_info = cur.fetchall()
 
-    knjige_last = cur.execute("""
-        SELECT vesela, zabavna, prijetna, predvidljiva, domisljijska, cudovita,
-        optimisticna, neeroticna, lahkotna, dolzina FROM lastnosti
-        WHERE book_id = """ + book_id)
-    knjiga_lastnosti = cur.fetchall()
-
-    return template('knjiga.html', napaka=napaka, knjiga_info = knjiga_info, knjiga_lastnosti = knjiga_lastnosti, noMenu='true')
+    templ = prikaziLastnosti(napaka, book_id)
+    return templ
 
 @post('/knjiga')
-def knjiga_post():
-    username = request.forms.username
-    geslo = request.forms.password
+def post_comment():
+    new_comment = request.forms.new_comment
+    book_id = request.forms.book_id
+    starRating = request.forms.starRating
+    oseba = preveriUporabnika()
+
+    napaka = nastaviSporocilo()
+
+
+    cur.execute("""INSERT INTO ocene_uporabnikov (book_id, uporabnik_id, komentar, ocena) VALUES (%s, %s, %s, %s)""", (book_id, oseba[0], new_comment, starRating))
+    templ = prikaziLastnosti(napaka, book_id)
+    return templ
     
-    if username is None or geslo is None:
-        nastaviSporocilo('Uporabniško ime in geslo morata biti neprazna') 
-        redirect(url('prijava_get'))   
-    hgeslo = None
-    try: 
-        cur.execute("SELECT geslo FROM uporabnik WHERE username = %s", (username, ))
-        hgeslo, = cur.fetchone()
-    except:
-        hgeslo = None
-    if hgeslo is None:
-        nastaviSporocilo('Uporabniško ime ali geslo nista ustrezni') 
-        redirect(url('prijava_get'))
-        return
-    if geslo != hgeslo:
-        nastaviSporocilo('Uporabniško ime ali geslo nista ustrezni') 
-        redirect(url('prijava_get'))
-        return
-    response.set_cookie('username', username, path="/", secret=skrivnost)
-    redirect(url('uporabnik'))
 
 #_______________________________________________________________________________________________________________________
 # ENA SAMA KNJIGA
@@ -418,3 +428,5 @@ cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 run(host='localhost', port=SERVER_PORT, reloader=RELOADER) # reloader=True nam olajša razvoj (osveževanje sproti - razvoj)
 #http://127.0.0.1:8080/
 print("http://127.0.0.1:8080/")
+
+    
