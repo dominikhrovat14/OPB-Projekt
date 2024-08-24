@@ -89,6 +89,20 @@ def prikaziLastnosti(napaka, book_id):
 
     return template('knjiga.html', napaka=napaka, book_id = book_id, knjiga_info = knjiga_info, knjiga_lastnosti = knjiga_lastnosti, knjige_komentarji = knjige_komentarji, noMenu='true')
 
+def prikaziAvtorja(napaka, avtor_id):
+    print(f"Fetching details for avtor_id: {avtor_id}")  # Debugging line
+    # Database queries and logic to fetch author details
+    cur.execute("SELECT avtor_id, ime_avtor, zivljenjepis FROM avtor WHERE avtor_id = %s", (avtor_id,))
+    avtor_info = cur.fetchall()
+
+    # Fetch the list of books by this author
+    cur.execute("SELECT id, naslov, naslov_orig, leto_izdaje, ocena, jezik FROM knjiga WHERE avtor_id = %s", (avtor_id,))
+    knjige_avtorja = cur.fetchall()
+
+    return template('o_avtorju.html', napaka=napaka, avtor_info=avtor_info, knjige_avtorja=knjige_avtorja, noMenu='false')
+
+
+
 # Mapa za statične vire (slike, css, ...)
 static_dir = "./static"
 
@@ -408,7 +422,13 @@ def avtorji():
     return template('avtorji.html', napaka = napaka, avtorji=avtorji, noMenu='false')
 #___________________________________________________________________________________________________________________________
 # O AVTORJU
-#
+@get('/avtor')
+def avtor_get():
+    napaka = nastaviSporocilo()
+    avtor_id = request.query['avtor_id']
+    print(f"Received avtor_id: {avtor_id}")  # Debugging line
+    templ = prikaziAvtorja(napaka, avtor_id)
+    return templ
 
 
 #___________________________________________________________________________________________________________________________
