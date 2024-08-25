@@ -1,9 +1,121 @@
 % setdefault('napaka', '')
-% rebase('base.html', napaka=napaka, oseba=oseba, sporocilo=sporocilo, naslov='Domača stran')
+% rebase('base.html', credit = credit, objave = objave, napaka=napaka, oseba=oseba, sporocilo=sporocilo, naslov='Domača stran')
+<html>
+<head>
+<style>
 
+ h1 {
+            font-size: 3em;
+            font-weight: 300;
+            line-height: 1em;
+            text-align: center;
+            color: #4DC3FA;
+        }
 
+        .blue { color: #185875; }
+        .yellow { color: #FFF842; }
+
+        .container_table th h1 {
+            font-weight: bold;
+            font-size: 14px;
+            text-align: left;
+            color: #185875;
+        }
+
+        .container_table td {
+            font-weight: normal;
+            font-size: 12px;
+            -webkit-box-shadow: 0 2px 2px -2px #0E1119;
+            -moz-box-shadow: 0 2px 2px -2px #0E1119;
+            box-shadow: 0 2px 2px -2px #0E1119;
+        }
+
+        .container_table {
+            text-align: left;
+            overflow: hidden;
+            width: 80%;
+            margin: 0 auto;
+            display: table;
+            padding: 0 0 8em 0;
+        }
+
+        .container_table td, .container_table th {
+            padding-bottom: 2%;
+            padding-top: 2%;
+            padding-left: 2%;
+        }
+
+        /* Background-color of the odd rows */
+        .container_table tr:nth-child(odd) {
+            background-color: white;
+        }
+
+        /* Background-color of the even rows */
+        .container_table tr:nth-child(even) {
+            background-color: #dfd3eb;
+        }
+
+        .table_th {
+            font-size: 16px;
+        }
+
+        .naslovClass, .avtorClass {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .naslovClass:hover, .avtorClass:hover {
+            background-color: #b2a5d4 !important;
+        }
+
+        .tableRounded {
+            border-collapse: collapse;
+            border-radius: 30px;
+            border-style: hidden;
+            box-shadow: 0 0 0 0.1px #666;
+        }
+</style>
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
+<script>
+
+	$(function() {
+		$(document).ready(function() {
+		
+		   
+		
+		  %for (id, izposoja_id, naslov, ime_avtor, full_name, status) in objave:
+		  
+			var izposoja_id = "{{izposoja_id}}"; 
+
+				if (izposoja_id != "") {
+				   var status_td = document.getElementById("status_"+{{id}}+"_"+izposoja_id);
+				   
+				   var status = status_td.innerHTML;
+				   //status true je vrnjeno
+				   if (status == "True"){
+
+						status_td.innerHTML = "Izposojena";
+						status_td.style.background = "lightcoral";
+				   
+				   }
+				   else{
+					status_td.style.background = "lightgreen";
+					status_td.innerHTML = "Vrnjena";
+				   }
+			   }
+		   
+		   %end
+		});
+	});
+
+</script>
+</head>
+<body>
 <h3>{{oseba[1]}} {{oseba[2]}}, pozdravljeni v eKnjižnici!</h3>
-<table id="izpis" class = "table table-success table-striped">
+<table id="izpis"  class = "table table-success table-striped">
             <div class="row">
                 <div class="col-md-6">
                     <label>Username</label>
@@ -25,21 +137,49 @@
                     <label>Email</label>
                 </div>
                 <div class="col-md-6">
-                    <p>{{oseba[5]}}</p>
+                    <p>{{oseba[4]}}</p>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <label>Starost</label>
+                    <label>Rojstvo</label>
                 </div>
                 <div class="col-md-6">
                     <p>{{oseba[6]}}</p>
                 </div>
             </div>
+			<div class="row">
+				<div class="col-md-6">
+                    <label>Krediti</label>
+                </div>
+                <div class="col-md-6">
+                    <p>{{credit}}</p>
+                </div>
 
+			</div>
 
 </table>
+<h1 style="float:left;color:black"> MOJE OBJAVE </h1>
+<table style="float:left" id="objave" class="container_table tableRounded">
+    <tr>
+        <th>NASLOV</th>
+        <th>AVTOR</th>
+		<th>IZPOSODIL</th>
+        <th>IZPOSOJENA</th>
+    </tr>    
+	%for (id, izposoja_id, naslov, ime_avtor, full_name, status) in objave:
+	<tr>
+		<td>{{naslov}}</td>
+		<td>{{ime_avtor}}</td>
+		<td>{{full_name}}</td>
+		<td id=status_{{id}}_{{izposoja_id}}>{{status}}</td>
+	</tr>
+	%end
+	
+</table>
 
+</body>
+</html>
 
 
 

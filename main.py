@@ -35,6 +35,7 @@ os.getcwd()
 #__________________________________________________________________________________________________________
 #FUNKCIJE
 
+
 #če je naslednje sporočilo prazno, izbrišemo cookie, sicer nastavimo novega (skrbimo, da sporočilo izgine)
 
 def nastaviSporocilo(sporocilo = None):
@@ -86,8 +87,18 @@ def prikaziLastnosti(napaka, book_id):
         FROM ocene_uporabnikov 
         WHERE book_id = """ + book_id)
     knjige_komentarji = cur.fetchall()
+    oseba = preveriUporabnika()
+    objave = cur.execute("""
+        SELECT DISTINCT o.id as id, CONCAT(u.ime, ' ', u.priimek) AS full_name, u.id as lastnik_id
+        FROM objava o LEFT JOIN uporabnik u ON o.uporabnik_id = u.id
+        LEFT JOIN izposoja i ON i.objava_id = o.id
+        LEFT JOIN uporabnik u2 ON i.lastnik_id = u2.id
+        WHERE o.book_id = %s AND o.uporabnik_id != %s AND (i.status = True OR i.status IS NULL) AND o.available = True""",(book_id, oseba[0],))
 
-    return template('knjiga.html', napaka=napaka, book_id = book_id, knjiga_info = knjiga_info, knjiga_lastnosti = knjiga_lastnosti, knjige_komentarji = knjige_komentarji, noMenu='true')
+    
+    objave = cur.fetchall()
+    print(objave)
+    return template('knjiga.html', napaka=napaka, oseba_id = oseba[0], book_id = book_id, objave = objave, knjiga_info = knjiga_info, knjiga_lastnosti = knjiga_lastnosti, knjige_komentarji = knjige_komentarji, noMenu='true')
 
 def prikaziAvtorja(napaka, avtor_id):
     print(f"Fetching details for avtor_id: {avtor_id}")  # Debugging line
@@ -111,6 +122,20 @@ skrivnost = "rODX3ulHw3ZYRdbIVcp1IfJTDn8iQTH6TFaNBgrSkjIulr"
 @route("/static/<filename:path>")
 def static(filename):
     return static_file(filename, root=static_dir)
+
+
+
+def enable_cors(fn):
+    def _enable_cors(*args, **kwargs):
+        # Nastavite CORS zaglavja za vsak odgovor
+        response.headers['Access-Control-Allow-Origin'] = '*'  # Ali določite določeno domeno namesto '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+        
+        if request.method == 'OPTIONS':
+            return {}  # Prazno telo za OPTIONS preflight zahteve
+        return fn(*args, **kwargs)
+    return _enable_cors
 
 #___________________________________________________________________________________________________________________________
 #ZAČETNA STRAN
@@ -173,10 +198,24 @@ def uporabnik():
     if oseba is None: 
         return
     napaka = nastaviSporocilo()
-    #cur.execute("""SELECT COUNT (*) FROM izposoja WHERE id_uporabnika=1""", (oseba[1], ))
+    
+
+    #Moje objave
+
+    objave =cur.execute("""SELECT o.id as id, i.id as izposoja_id,  k.naslov AS naslov, a.ime_avtor as ime_avtor, CONCAT(u.ime, ' ', u.priimek) AS full_name, i.status AS status FROM objava o
+                LEFT JOIN izposoja i ON i.objava_id = o.id
+                LEFT JOIN knjiga k ON o.book_id = k.id
+                LEFT JOIN avtor a ON a.avtor_id = k.avtor_id
+                LEFT JOIN uporabnik u ON u.id = i.uporabnik_id
+                WHERE o.uporabnik_id=%s""", (oseba[0], ))
+    objave = cur.fetchall()
+
+    credit =cur.execute("""SELECT credit FROM uporabnik
+                WHERE id=%s""", (oseba[0], ))
+    credit = cur.fetchone()
 
     sporocilo = ''
-    return template('uporabnik.html', oseba=oseba,napaka=napaka, sporocilo=sporocilo,noMenu='false')
+    return template('uporabnik.html', credit = credit[0], objave = objave, oseba=oseba,napaka=napaka, sporocilo=sporocilo,noMenu='false')
 
     
 #___________________________________________________________________________________________________________________________
@@ -366,7 +405,6 @@ def brskalnik():
 #___________________________________________________________________________________________________________________________
 # O KNJIGI
 #TODO
-#PRIJAVA
 @get('/knjiga')
 def knjiga_get():
     napaka = nastaviSporocilo()
@@ -390,26 +428,81 @@ def post_comment():
     return templ
     
 
-#_______________________________________________________________________________________________________________________
-# ENA SAMA KNJIGA
-
-
 
 #___________________________________________________________________________________________________________________________
 # UPORABNIKOVA IZBIRKA KNJIG
 #TODO
 @get('/moje_knjige')
 def moje_knjige_get():
-    print("test")
     napaka = nastaviSporocilo()
     oseba = preveriUporabnika()
-    id_uporabnika = oseba[0]
-    k = cur.execute("""SELECT id FROM knjiga""")
-                        #WHERE id_uporabnika=%s""",(id_uporabnika,))
-    k = cur.fetchall()
-    return template('moje_knjige.html', napaka=napaka, noMenu='false')
+    cur.execute("""SELECT o.id as objava_id, i.id as id, i.status as status, i.datum_izposoje as datum_izposoje, i.datum_vracila as datum_vracila, k.naslov as naslov
+                    FROM izposoja i LEFT JOIN knjiga k ON i.book_id = k.id
+                    LEFT JOIN objava o ON o.id = i.objava_id
+                    WHERE i.uporabnik_id =%s""",(oseba[0],))
+    izposoje = cur.fetchall()
+    
+    return template('moje_knjige.html', napaka=napaka, izposoje = izposoje, noMenu='false')
+
+@route('/vracilo', method=['OPTIONS', 'POST'])
+@enable_cors
+def vracilo():
+    # TODO ZAKAJ NE DELA REDIRECT 
+    izposoja_id = request.json.get('id')
+    objava_id = request.json.get('objava_id')
+    napaka = nastaviSporocilo()
+    cur.execute("""UPDATE izposoja SET status = TRUE, datum_vracila = CURRENT_DATE WHERE id = %s""", (izposoja_id,))
+
+    cur.execute("""UPDATE objava SET available = TRUE WHERE id = %s""", (objava_id,))
+    # Preusmeritev na drugo stran po uspešni obdelavi
+    redirect('/moje_knjige')
+
+@route('/izposoja', method=['OPTIONS', 'POST'])
+@enable_cors
+def izposoja():
+    # TODO ZAKAJ NE DELA REDIRECT
+    objava_id = request.json.get('id')
+    lastnik_id = request.json.get('lastnik_id')
+    uporabnik_id = request.json.get('uporabnik_id')
+    book_id = request.json.get('book_id')
+    napaka = nastaviSporocilo()
+    cur.execute("""INSERT INTO izposoja (book_id, uporabnik_id, lastnik_id, status, datum_izposoje, objava_id) VALUES (%s, %s, %s, False, CURRENT_DATE, %s)""", (book_id, uporabnik_id, lastnik_id, objava_id))
+
+    credit =cur.execute("""SELECT credit FROM uporabnik
+                WHERE id=%s""", (uporabnik_id, ))
+    credit = cur.fetchone()
+
+    cur.execute("""UPDATE objava SET available = FALSE WHERE id = %s""", (objava_id,))
+
+    cur.execute("""UPDATE uporabnik SET credit = %s WHERE id = %s""", (credit[0] - 1, uporabnik_id,))
+
+    #Lastniku se kredit poveca
+    credit =cur.execute("""SELECT credit FROM uporabnik
+                WHERE id=%s""", (lastnik_id, ))
+    credit = cur.fetchone()
+    
+    cur.execute("""UPDATE uporabnik SET credit = %s WHERE id = %s""", (credit[0] + 1, lastnik_id,))
+    
 
 
+    
+@post('/objavi')
+def objavi():    
+    book_id = request.forms.book_id
+    oseba = preveriUporabnika()
+    napaka = nastaviSporocilo()
+    cur.execute("""INSERT INTO objava (book_id, uporabnik_id) VALUES (%s, %s)""", (book_id, oseba[0]))
+    
+    credit =cur.execute("""SELECT credit FROM uporabnik
+                WHERE id=%s""", (oseba[0], ))
+    credit = cur.fetchone()
+
+    cur.execute("""UPDATE uporabnik SET credit = %s WHERE id = %s""", (credit[0] + 1, oseba[0],))
+
+    templ = prikaziLastnosti(napaka, book_id)
+
+    return templ
+    
 #___________________________________________________________________________________________________________________________
 # ENA SAMA KNJIGA
 # todo 

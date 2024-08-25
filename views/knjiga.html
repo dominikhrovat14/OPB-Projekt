@@ -1,6 +1,6 @@
 % setdefault('napaka', '')
 % setdefault('naslov', 'Lastnosti')
-% rebase('base.html', book_id = book_id, napaka=napaka, naslov=naslov, knjiga_info=knjiga_info, knjiga_lastnosti = knjiga_lastnosti, knjige_komentarji = knjige_komentarji, noMenu='true')
+% rebase('base.html', objave = objave, oseba_id = oseba_id, book_id = book_id, napaka=napaka, naslov=naslov, knjiga_info=knjiga_info, knjiga_lastnosti = knjiga_lastnosti, knjige_komentarji = knjige_komentarji, noMenu='true')
 
 <html>
 <head>
@@ -8,6 +8,66 @@
 			form  {
 				margin: 60px 0 0 0 !important;
 			 }
+			 
+			 .table_th {
+            font-size: 16px;
+			}
+			
+			 .container_table th h1 {
+            font-weight: bold;
+            font-size: 14px;
+            text-align: left;
+            color: #185875;
+        }
+
+        .container_table td {
+            font-weight: normal;
+            font-size: 12px;
+            -webkit-box-shadow: 0 2px 2px -2px #0E1119;
+            -moz-box-shadow: 0 2px 2px -2px #0E1119;
+            box-shadow: 0 2px 2px -2px #0E1119;
+        }
+
+        .container_table {
+            text-align: left;
+            overflow: hidden;
+            width: 80%;
+            margin: 0 auto;
+            display: table;
+            padding: 0 0 8em 0;
+        }
+
+        .container_table td, .container_table th {
+            padding-bottom: 2%;
+            padding-top: 2%;
+            padding-left: 2%;
+        }
+
+        /* Background-color of the odd rows */
+        .container_table tr:nth-child(odd) {
+            background-color: white;
+        }
+
+        /* Background-color of the even rows */
+        .container_table tr:nth-child(even) {
+            background-color: #dfd3eb;
+        }
+
+			.naslovClass, .avtorClass {
+				cursor: pointer;
+				transition: background-color 0.3s ease;
+			}
+
+			.naslovClass:hover, .avtorClass:hover {
+				background-color: #b2a5d4 !important;
+			}
+
+			.tableRounded {
+				border-collapse: collapse;
+				border-radius: 30px;
+				border-style: hidden;
+				box-shadow: 0 0 0 0.1px #666;
+			}
 			 
 			.ui-slider .ui-btn-inner {
 				padding: 4px 0 0 0 !important;
@@ -162,6 +222,54 @@
 
 					});
 				%end	
+				
+				
+				//izposoja
+				
+				
+				%for (id, full_name, lastnik_id) in objave:
+			   var izposoja_td = document.getElementById("izposoja_"+{{id}});
+				var img = document.createElement('img');
+				img.src = './static/img/borrow.png'; 
+				img.style.width = "34px";
+				img.style.cursor = "pointer";
+				img.title = "Izposodi si knjigo";
+
+				img.onclick = function(){
+					//posodobitev v bazi
+					// Define the URL of your Bottle server endpoint
+					var url = 'http://localhost:8080/izposoja'; // Ensure this matches the Bottle server URL
+
+					// Define the data to send in the request body
+					var data = {
+						id: {{id}},
+						book_id:{{book_id}},
+						lastnik_id:{{lastnik_id}},
+						uporabnik_id:{{oseba_id}},
+					};
+
+					// Send a POST request
+					fetch(url, {
+						method: 'POST', // Specify the HTTP method
+						headers: {
+							'Content-Type': 'application/json', // Specify the content type
+						},
+						body: JSON.stringify(data), // Convert the data to a JSON string
+					})
+					.then((response) => response.json()) // Parse the JSON response
+					.then((data) => {
+						console.log('Success:', data); // Log the response data
+					})
+					.catch((error) => {
+						console.error('Error:', error); // Log any errors
+					});
+				}
+				
+				izposoja_td.appendChild(img);
+			   
+			   
+			   %end
+	
 			});
 			
         });
@@ -186,6 +294,8 @@
             });
 		
          });
+		 
+		 
 		 
 		
 		
@@ -343,6 +453,42 @@
 				
 			
 			%end
+			</td>
+		</tr>
+		<tr>
+		<td colspan="2" style="float:left;margin-top:50px;text-align:left;margin-bottom:40px">
+			<h1>Objave</h1>
+			<form id="formData" action="{{url('objavi')}}" method="POST">
+			<input style="display:none" name = "book_id" value={{book_id}}></input>
+			<table>
+				<tr>
+					<td style="vertical-align:top; text-align:left;">
+						<div>
+							<p><input style="font-size:14px!important;" class="zacetni_gumb btn btn-primary" type="submit" value="Objavi knjigo"></p>
+						</div>
+					</td>
+				</tr>
+			</table>
+			</form>
+		</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align:left;margin-bottom:40px">
+				<table id="izpis" class="container_table tableRounded">
+					<tr>
+						<th>Oseba</th>
+						<th>Izposoja</th>
+	
+					</tr>    
+					%for (id, full_name, lastnik_id) in objave:
+					<tr id={{id}}>
+						<td id=lastnik_{{lastnik_id}}>{{full_name}}</td>
+						<td id=izposoja_{{id}}></td>
+
+					</tr>
+					%end
+					
+				</table>
 			</td>
 		</tr>
 		
