@@ -312,13 +312,23 @@
 						},
 						body: JSON.stringify(data), // Convert the data to a JSON string
 					})
-					.then((response) => response.json()) // Parse the JSON response
+					.then((response) => {
+						if (!response.ok) {
+							// Check if the response status is not OK (e.g., 4xx, 5xx status codes)
+							return response.json().then((errorData) => {
+								throw new Error(errorData.message || 'Something went wrong!');
+							});
+						}
+						return response.json(); // Parse the JSON response if the response is OK
+					}) // Parse the JSON response
 					.then((data) => {
 						console.log('Success:', data); // Log the response data
 					})
 					.catch((error) => {
 						console.error('Error:', error); // Log any errors
 					});
+					
+					setTimeout(function(){ window.location.reload(); }, 2500);
 				}
 				
 				izposoja_td.appendChild(img);

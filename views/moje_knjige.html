@@ -144,6 +144,10 @@
 						.catch((error) => {
 							console.error('Error:', error); // Log any errors
 						});
+						
+						setTimeout(function(){ window.location.reload(); }, 2500);
+						
+						
 					}
 					
 					status_td.appendChild(buttonEl);
