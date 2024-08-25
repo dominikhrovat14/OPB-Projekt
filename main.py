@@ -69,12 +69,19 @@ def hashGesla(s):
 
 def prikaziLastnosti(napaka, book_id):
     knjige = cur.execute("""
-        SELECT a.ime_avtor as avtor, k.naslov as naslov, k.avtor_id as avtor_id, k.ocena as ocena,
-        k.stevilo_ocen as stevilo_ocen, EXTRACT('year' FROM k.leto_izdaje) as leto, k.jezik as jezik 
+        SELECT a.ime_avtor as avtor, k.naslov as naslov, k.avtor_id as avtor_id,
+        k.stevilo_ocen as stevilo_ocen, k.opis as opis, EXTRACT('year' FROM k.leto_izdaje) as leto, k.jezik as jezik 
         FROM knjiga k
         LEFT JOIN avtor a ON a.avtor_id = k.avtor_id
         WHERE k.id = """ + book_id)
     knjiga_info = cur.fetchall()
+
+    cur.execute("""
+        SELECT k.opis
+        FROM knjiga k
+        WHERE k.id = %s""", (book_id,))
+    opis_info = cur.fetchone()
+    opis = opis_info['opis'] if opis_info else 'Ta knjiga nima opisa.'
 
     knjige_last = cur.execute("""
         SELECT vesela, zabavna, prijetna, predvidljiva, domisljijska, cudovita,
@@ -95,10 +102,17 @@ def prikaziLastnosti(napaka, book_id):
         LEFT JOIN uporabnik u2 ON i.lastnik_id = u2.id
         WHERE o.book_id = %s AND o.uporabnik_id != %s AND (i.status = True OR i.status IS NULL) AND o.available = True""",(book_id, oseba[0],))
 
+    zanri = cur.execute("""
+        SELECT z.zanr
+        FROM zanri z
+        WHERE z.book_id = """ + book_id)
+    zanri = cur.fetchall()
+    zanri_string = ', '.join(zanr[0] for zanr in zanri)
     
     objave = cur.fetchall()
     print(objave)
-    return template('knjiga.html', napaka=napaka, oseba_id = oseba[0], book_id = book_id, objave = objave, knjiga_info = knjiga_info, knjiga_lastnosti = knjiga_lastnosti, knjige_komentarji = knjige_komentarji, noMenu='true')
+
+    return template('knjiga.html', napaka=napaka, oseba_id = oseba[0], book_id = book_id, objave = objave, knjiga_info = knjiga_info, knjiga_lastnosti = knjiga_lastnosti, knjige_komentarji = knjige_komentarji, zanri=zanri_string, opis=opis, noMenu='false')
 
 def prikaziAvtorja(napaka, avtor_id):
     print(f"Fetching details for avtor_id: {avtor_id}")  # Debugging line
@@ -112,7 +126,74 @@ def prikaziAvtorja(napaka, avtor_id):
 
     return template('o_avtorju.html', napaka=napaka, avtor_info=avtor_info, knjige_avtorja=knjige_avtorja, noMenu='false')
 
+#_______________________________________________________________________________________________________________________
+# funkcija za primerjavo knjig - NOVO
 
+def euclidean_distance(book1, book2, attributes):
+    distance = 0
+    for attr in attributes:
+        distance += (book1.get(attr, 0) - book2.get(attr, 0)) ** 2
+    return distance ** (1/2)
+
+def find_most_similar_books(user_data, books_db, threshold=50):
+    if not user_data:
+            # Return an empty list if user_data is empty
+            return []
+
+    attributes = list(user_data.keys())
+    similar_books = []
+
+    for book in books_db:
+        book_attributes = {key: book[key] for key in attributes if key in book}
+        distance = euclidean_distance(user_data, book_attributes, attributes)
+        
+        if distance < threshold:
+            similar_books.append(book['book_id'])
+    
+    # Return the list of book IDs
+    return similar_books
+
+
+
+def fetch_books_from_db():
+    # Use the existing global connection and cursor
+    global conn
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    
+    # Define the SQL query to fetch attributes
+    query = """
+    SELECT book_id, vesela, zabavna, prijetna, predvidljiva, domisljijska, cudovita, optimisticna, neeroticna, lahkotna
+    FROM lastnosti
+    """
+    
+    # Execute the query
+    cur.execute(query)
+    
+    # Fetch all rows from the executed query
+    rows = cur.fetchall()
+    
+    # Convert rows to a dictionary with book_id as the key
+    book_dict = {
+        row['book_id']: {
+            'vesela': row['vesela'],
+            'zabavna': row['zabavna'],
+            'prijetna': row['prijetna'],
+            'predvidljiva': row['predvidljiva'],
+            'domisljijska': row['domisljijska'],
+            'cudovita': row['cudovita'],
+            'optimisticna': row['optimisticna'],
+            'neeroticna': row['neeroticna'],
+            'lahkotna': row['lahkotna'],
+            'dolzina': row['dolzina'],
+        }
+        for row in rows
+    }
+    
+    # Close the cursor and return the result
+    cur.close()
+    return book_dict
+#_______________________________________________________________________________________________________________________
+# NOVO
 
 # Mapa za statične vire (slike, css, ...)
 static_dir = "./static"
@@ -427,6 +508,96 @@ def post_comment():
     templ = prikaziLastnosti(napaka, book_id)
     return templ
     
+#_______________________________________________________________________________________________________________________
+# NAPREDNO ISKANJE - NOVO
+@get('/napredno_iskanje')
+def napredno_iskanje_get():
+    napaka = nastaviSporocilo()
+    similar_books = []  # Default to an empty list
+    oseba = preveriUporabnika()
+    # Here, you can initialize any data needed for the advanced search page
+    # For example, options for dropdowns, etc.
+    return template('napredno_iskanje.html', napaka=napaka, noMenu='false',similar_books=similar_books)
+
+@post('/napredno_iskanje')
+def napredno_iskanje_post():
+    napaka = nastaviSporocilo()
+
+    # Initialize user_data as an empty dictionary
+    user_data = {}
+
+    # List of slider names
+    sliders = ['vesela', 'zabavna', 'prijetna', 'predvidljiva', 'domisljijska', 'cudovita', 'optimisticna', 'neeroticna', 'lahkotna']
+
+    # Iterate through sliders and check if each is active
+    for slider in sliders:
+        # Get the compare button status
+        compare_status = request.forms.get(f'compare_{slider}', 'false') == 'true'
+        
+        # Only include in user_data if compare button is active
+        if compare_status:
+            # Retrieve the slider value
+            slider_value = request.forms.get(slider, 50)
+            user_data[slider] = int(slider_value)
+    
+    # Print or process the data as needed
+    print("User data received from sliders:", user_data)
+
+    cur.execute("""
+        SELECT book_id, vesela, zabavna, prijetna, predvidljiva, domisljijska, cudovita,
+               optimisticna, neeroticna, lahkotna
+        FROM lastnosti
+    """)
+    books_db = cur.fetchall()
+
+    books_db = [
+        {
+            'book_id': row['book_id'],
+            'vesela': row['vesela'],
+            'zabavna': row['zabavna'],
+            'prijetna': row['prijetna'],
+            'predvidljiva': row['predvidljiva'],
+            'domisljijska': row['domisljijska'],
+            'cudovita': row['cudovita'],
+            'optimisticna': row['optimisticna'],
+            'neeroticna': row['neeroticna'],
+            'lahkotna': row['lahkotna']
+        }
+        for row in books_db
+    ]
+
+    similar_books_ids = find_most_similar_books(user_data, books_db, threshold=25)
+    # print("Podobne knjige:", similar_books_ids) 
+    
+    if similar_books_ids:
+        similar_books_ids_placeholder = ', '.join(str(id) for id in similar_books_ids)
+        
+        cur.execute(f"""
+            SELECT k.id as book_id, k.naslov as naslov, a.ime_avtor as avtor, k.stevilo_ocen as stevilo_ocen, EXTRACT('year' FROM k.leto_izdaje) as leto, k.jezik as jezik
+            FROM knjiga k
+            LEFT JOIN avtor a ON a.avtor_id = k.avtor_id
+            WHERE k.id IN ({similar_books_ids_placeholder})
+        """)
+        similar_books = cur.fetchall()
+    else:
+        similar_books = []
+
+    similar_books = [
+    {
+        'book_id': row['book_id'],          
+        'naslov': row['naslov'],            
+        'avtor': row['avtor'],             
+        'stevilo_ocen': row['stevilo_ocen'],            
+        'leto': row['leto'],             
+        'jezik': row['jezik']              
+    }
+    for row in similar_books
+]
+    
+    return template('napredno_iskanje.html', napaka=napaka, noMenu='false', similar_books=similar_books)
+
+#NOVO
+#_______________________________________________________________________________________________________________________
 
 
 #___________________________________________________________________________________________________________________________
