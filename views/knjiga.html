@@ -1,6 +1,6 @@
 % setdefault('napaka', '')
 % setdefault('naslov', 'Lastnosti')
-% rebase('base.html', objave = objave, oseba_id = oseba_id, book_id = book_id, napaka=napaka, naslov=naslov, knjiga_info=knjiga_info, knjiga_lastnosti = knjiga_lastnosti, knjige_komentarji = knjige_komentarji, noMenu='true')
+% rebase('base.html', objave = objave, oseba_id = oseba_id, book_id = book_id, napaka=napaka, naslov=naslov, knjiga_info=knjiga_info, knjiga_lastnosti = knjiga_lastnosti, knjige_komentarji = knjige_komentarji,zanri=zanri, opis=opis, noMenu='false')
 
 <html>
 <head>
@@ -124,11 +124,14 @@
 	
         $(function() {
 			$(document).ready(function() {
-				
 				//Zacnetni vrednosti
 				var vesela_val     = 0;
 				var zabavna_val    = 0;
 				var prijetna_val   = 0;
+				var predvidljiva_val   = 0;
+				var domisljijska_val   = 0;
+				var cudovita_val   = 0;
+				var optimisticna_val   = 0;
 				var neeroticna_val = 0;
 				var lahkotna_val   = 0;
 	
@@ -138,6 +141,10 @@
 					vesela_val 	   = {{vesela}};
 					zabavna_val    = {{zabavna}}
 					prijetna_val   = {{prijetna}}
+					predvidljiva_val   = {{predvidljiva}}
+					domisljijska_val   = {{domisljijska}}
+					cudovita_val   = {{cudovita}}
+					optimisticna_val   = {{optimisticna}}
 					neeroticna_val = {{neeroticna}}
 					lahkotna_val   = {{lahkotna}}
 				
@@ -178,6 +185,55 @@
 					}
 				});
 				$("#slider-range-prijetna").slider("option", "disabled", true);
+
+
+				$("#slider-range-predvidljiva").slider({
+					value: predvidljiva_val, // Initial value
+					min: 0, // Minimum value
+					max: 100, // Maximum value
+					step: 1, // Step value
+					slide: function(event, ui) {
+						// Update the slider value display when sliding
+						$("#predvidljiva").text(ui.value);
+					}
+				});
+				$("#slider-range-predvidljiva").slider("option", "disabled", true);
+
+				$("#slider-range-domisljijska").slider({
+					value: domisljijska_val, // Initial value
+					min: 0, // Minimum value
+					max: 100, // Maximum value
+					step: 1, // Step value
+					slide: function(event, ui) {
+						// Update the slider value display when sliding
+						$("#domisljijska").text(ui.value);
+					}
+				});
+				$("#slider-range-domisljijska").slider("option", "disabled", true);
+
+				$("#slider-range-cudovita").slider({
+					value: cudovita_val, // Initial value
+					min: 0, // Minimum value
+					max: 100, // Maximum value
+					step: 1, // Step value
+					slide: function(event, ui) {
+						// Update the slider value display when sliding
+						$("#cudovita").text(ui.value);
+					}
+				});
+				$("#slider-range-cudovita").slider("option", "disabled", true);
+
+				$("#slider-range-optimisticna").slider({
+					value: optimisticna_val, // Initial value
+					min: 0, // Minimum value
+					max: 100, // Maximum value
+					step: 1, // Step value
+					slide: function(event, ui) {
+						// Update the slider value display when sliding
+						$("#optimisticna").text(ui.value);
+					}
+				});
+				$("#slider-range-optimisticna").slider("option", "disabled", true);
 				
 				$("#slider-range-neeroticna").slider({
 					value: neeroticna_val, // Initial value
@@ -315,7 +371,7 @@
 				<h1> {{naslov}} </h1>
 				<h3> {{avtor}} </h3>
 				<img src="{{url('static', filename= '/img/lord_jim.jpg')}}" alt="" width="200" height="300">
-	
+				<p>{{opis}}</p>
 			%end
 			</td>
 			
@@ -323,7 +379,10 @@
 			
 			<td style="margin-top:20px;float:left">
 			
-			
+			<!-- Žanri -->
+			<span style="display: inline; margin-right: 8px;">Žanri:</span>
+			<span style="display: inline; font-size: smaller; font-weight: bold; margin: 0;">{{zanri}}</span>
+
 				
 				<div>
 					<table>
@@ -351,7 +410,7 @@
 							
 							</td>
 							<td>
-							Dolgočasna
+							Resna
 							</td>
 						</tr>
 						
@@ -368,6 +427,63 @@
 							Stresna
 							</td>
 						</tr>
+
+						<tr>
+							<td>
+							Predvidljiva
+							</td>
+							<td >
+							<div id="slider-range-predvidljiva" class="slider-color"></div>
+								<input type="text" id="prijetna" readonly="" style="border:0;display:none">
+							
+							</td>
+							<td>
+							Nepredvidljiva
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+							Domišljijska 
+							</td>
+							<td >
+							<div id="slider-range-domisljijska" class="slider-color"></div>
+								<input type="text" id="domisljijska" readonly="" style="border:0;display:none">
+							
+							</td>
+							<td>
+							Prizemljena
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+							Čudovita
+							</td>
+							<td >
+							<div id="slider-range-cudovita" class="slider-color"></div>
+								<input type="text" id="cudovita" readonly="" style="border:0;display:none">
+							
+							</td>
+							<td>
+							Neokusna
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+							Optimistična
+							</td>
+							<td >
+							<div id="slider-range-optimisticna" class="slider-color"></div>
+								<input type="text" id="optimisticna" readonly="" style="border:0;display:none">
+							
+							</td>
+							<td>
+							Črnogleda
+							</td>
+						</tr>
+
 						
 						<tr>
 							<td>
