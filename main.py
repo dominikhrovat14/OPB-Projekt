@@ -101,6 +101,7 @@ def prikaziLastnosti(napaka, book_id):
         LEFT JOIN izposoja i ON i.objava_id = o.id
         LEFT JOIN uporabnik u2 ON i.lastnik_id = u2.id
         WHERE o.book_id = %s AND o.uporabnik_id != %s AND (i.status = True OR i.status IS NULL) AND o.available = True""",(book_id, oseba[0],))
+    objave = cur.fetchall()
 
     zanri = cur.execute("""
         SELECT z.zanr
@@ -109,7 +110,7 @@ def prikaziLastnosti(napaka, book_id):
     zanri = cur.fetchall()
     zanri_string = ', '.join(zanr[0] for zanr in zanri)
     
-    objave = cur.fetchall()
+    
     print(objave)
 
     return template('knjiga.html', napaka=napaka, oseba_id = oseba[0], book_id = book_id, objave = objave, knjiga_info = knjiga_info, knjiga_lastnosti = knjiga_lastnosti, knjige_komentarji = knjige_komentarji, zanri=zanri_string, opis=opis, noMenu='false')
@@ -637,22 +638,28 @@ def izposoja():
     uporabnik_id = request.json.get('uporabnik_id')
     book_id = request.json.get('book_id')
     napaka = nastaviSporocilo()
-    cur.execute("""INSERT INTO izposoja (book_id, uporabnik_id, lastnik_id, status, datum_izposoje, objava_id) VALUES (%s, %s, %s, False, CURRENT_DATE, %s)""", (book_id, uporabnik_id, lastnik_id, objava_id))
 
     credit =cur.execute("""SELECT credit FROM uporabnik
                 WHERE id=%s""", (uporabnik_id, ))
     credit = cur.fetchone()
-
-    cur.execute("""UPDATE objava SET available = FALSE WHERE id = %s""", (objava_id,))
-
-    cur.execute("""UPDATE uporabnik SET credit = %s WHERE id = %s""", (credit[0] - 1, uporabnik_id,))
-
-    #Lastniku se kredit poveca
-    credit =cur.execute("""SELECT credit FROM uporabnik
-                WHERE id=%s""", (lastnik_id, ))
-    credit = cur.fetchone()
+    print(credit[0])
+    #najprej preverimo, če uporabnik se ima kredite
+    if credit[0] > 0:
     
-    cur.execute("""UPDATE uporabnik SET credit = %s WHERE id = %s""", (credit[0] + 1, lastnik_id,))
+        cur.execute("""INSERT INTO izposoja (book_id, uporabnik_id, lastnik_id, status, datum_izposoje, objava_id) VALUES (%s, %s, %s, False, CURRENT_DATE, %s)""", (book_id, uporabnik_id, lastnik_id, objava_id))
+
+        cur.execute("""UPDATE objava SET available = FALSE WHERE id = %s""", (objava_id,))
+
+        cur.execute("""UPDATE uporabnik SET credit = %s WHERE id = %s""", (credit[0] - 1, uporabnik_id,))
+
+        #Lastniku se kredit poveca
+        credit =cur.execute("""SELECT credit FROM uporabnik
+                    WHERE id=%s""", (lastnik_id, ))
+        credit = cur.fetchone()
+        
+        cur.execute("""UPDATE uporabnik SET credit = %s WHERE id = %s""", (credit[0] + 1, lastnik_id,))
+    else:
+        errorString = "NAPAKA, NIMATE VEČ KREDITOV"
     
 
 
@@ -712,5 +719,9 @@ cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 run(host='localhost', port=SERVER_PORT, reloader=RELOADER) # reloader=True nam olajša razvoj (osveževanje sproti - razvoj)
 #http://127.0.0.1:8080/
 print("http://127.0.0.1:8080/")
+
+# poženemo strežnik na podanih vratih, npr. http://localhost:8080/
+if __name__ == "__main__":
+    run(host='localhost', port=SERVER_PORT, reloader=RELOADER)
 
     
