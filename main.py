@@ -29,7 +29,7 @@ from datetime import date
 SERVER_PORT = os.environ.get('BOTTLE_PORT', 8080)
 RELOADER = os.environ.get('BOTTLE_RELOADER', True)
 ROOT = os.environ.get('BOTTLE_ROOT', '/') 
-DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
+DB_PORT = os.environ.get('POSTGRES_PORT', 443)
 os.getcwd()
 
 #__________________________________________________________________________________________________________
