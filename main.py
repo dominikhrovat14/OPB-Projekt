@@ -708,11 +708,6 @@ def avtor_get():
 #___________________________________________________________________________________________________________________________
 #POVEZAVA NA BAZO
 
-db="sem2023_milkag"
-user="milkag"
-#password="1pmlybto"
-password="ljhgej43"
-
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s sumniki
 #conn = psycopg2.connect(database=db, host='baza.fmf.uni-lj.si', user=user, password=password, port=DB_PORT)
 #conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) # onemogocimo transakcije
