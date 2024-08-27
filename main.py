@@ -5,7 +5,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 #Uvoz podatkov za povezavo
-import auth_public as auth
+import auth as auth
 
 # Set up logging with rotation
 handler = RotatingFileHandler('application.log', maxBytes=2000, backupCount=5)
