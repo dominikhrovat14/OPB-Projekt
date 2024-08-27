@@ -711,7 +711,7 @@ user="milkag"
 password="ljhgej43"
 
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s sumniki
-conn = psycopg2.connect(database=db, host='baza.fmf.uni-lj.si', user=user, password=password)
+conn = psycopg2.connect(database=db, host='baza.fmf.uni-lj.si', user=user, password=password, port=DB_PORT)
 conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) # onemogocimo transakcije
 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor) 
 
