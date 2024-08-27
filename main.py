@@ -4,6 +4,9 @@ from bottleext import *
 import logging
 from logging.handlers import RotatingFileHandler
 
+#Uvoz podatkov za povezavo
+import auth_public as auth
+
 # Set up logging with rotation
 handler = RotatingFileHandler('application.log', maxBytes=2000, backupCount=5)
 logging.basicConfig(
@@ -711,10 +714,13 @@ user="milkag"
 password="ljhgej43"
 
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s sumniki
-conn = psycopg2.connect(database=db, host='baza.fmf.uni-lj.si', user=user, password=password, port=DB_PORT)
-conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) # onemogocimo transakcije
-cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor) 
+#conn = psycopg2.connect(database=db, host='baza.fmf.uni-lj.si', user=user, password=password, port=DB_PORT)
+#conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) # onemogocimo transakcije
+#cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor) 
 
+conn = psycopg2.connect(database=auth.dbname, host=auth.host, user=auth.user, password=auth.password, port=DB_PORT)
+conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) #Onemogočimo transakcije #### Za enkrat ne rabimo
+cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 #Požnemo strežnik
 #run(host='localhost', port=SERVER_PORT, reloader=RELOADER) # reloader=True nam olajša razvoj (osveževanje sproti - razvoj)
 #http://127.0.0.1:8080/
