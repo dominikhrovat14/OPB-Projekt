@@ -131,11 +131,15 @@
 
     <script>
         var bookDataRedirect = function(book_id) {
-            window.location.replace("https://hub.binder.curvenote.dev/user/dominikhrovat14-opb-projekt-zeitxam0/proxy/8080/knjiga?book_id=" + book_id);
+            // Construct the URL relative to the current path
+            var relativeURL = "knjiga?book_id=" + book_id;
+            window.location.href = relativeURL;
         }
 
         var authorDataRedirect = function(author_id) {
-            window.location.replace("https://hub.binder.curvenote.dev/user/dominikhrovat14-opb-projekt-zeitxam0/proxy/8080/avtor?avtor_id=" + author_id);
+            // Construct the URL relative to the current path
+            var relativeURL = "avtor?avtor_id=" + author_id;
+            window.location.href = relativeURL;
         }
 
         $(function() {
