@@ -42,15 +42,13 @@
 
         .sliders {
             width: 60%;
-            /* Adjust width as needed */
             display: flex;
-            flex-direction: column; /* Arrange sliders vertically */
-            gap: 20px; /* Space between sliders */
+            flex-direction: column;
+            gap: 20px;
         }
 
         .results {
             width: 35%;
-            /* Adjust width as needed */
             padding-left: 20px;
         }
 
@@ -58,8 +56,6 @@
             text-align: left;
             overflow: hidden;
             width: 100%;
-            display: table;
-            padding: 0 0 8em 0;
             border-collapse: collapse;
             border-radius: 30px;
             border-style: hidden;
@@ -71,9 +67,7 @@
             font-size: 14px;
             text-align: left;
             color: #185875;
-            padding-bottom: 2%;
-            padding-top: 2%;
-            padding-left: 2%;
+            padding: 2% 2% 2% 2%;
         }
 
         .container_table td {
@@ -82,9 +76,7 @@
             -webkit-box-shadow: 0 2px 2px -2px #0E1119;
             -moz-box-shadow: 0 2px 2px -2px #0E1119;
             box-shadow: 0 2px 2px -2px #0E1119;
-            padding-bottom: 2%;
-            padding-top: 2%;
-            padding-left: 2%;
+            padding: 2% 2% 2% 2%;
             transition: background-color 0.3s ease;
         }
 
@@ -103,8 +95,7 @@
         .slider-container {
             margin: 20px 0;
             display: flex;
-            flex-direction: row; /* Keep items in each container aligned horizontally */
-            align-items: center; /* Align items vertically in each container */
+            align-items: center;
             gap: 10px;
         }
 
@@ -138,7 +129,7 @@
         }
 
         .slider-container .ui-slider {
-            width: 200px; /* Adjust width as needed */
+            width: 200px;
         }
 
         .slider-container .slider-value {
@@ -177,8 +168,6 @@
                 var isChecked = compareInput.val() === 'true';
                 compareInput.val(isChecked ? 'false' : 'true');
                 $("#" + id + "-compare-btn").toggleClass('active', !isChecked);
-
-                // Enable/disable the hidden input based on the button state
                 $("#" + id + "-hidden").prop('disabled', isChecked);
             }
 
@@ -197,10 +186,13 @@
                 toggleCompare(id);
             });
         });
+
+        var bookDataRedirect = function(book_id) {
+            window.location.replace("https://hub.binder.curvenote.dev/user/dominikhrovat14-opb-projekt-zeitxam0/proxy/8080/knjiga?book_id=" + book_id);
+        };
     </script>
 </head>
 <body>
-    
     <div class="container">
         <!-- Sliders Section -->
         <div class="sliders">
@@ -244,7 +236,7 @@
                 </div>
                 <div class="slider-container">
                     <button type="button" class="compare-button" data-id="domisljijska" id="domisljijska-compare-btn">X</button>
-                    <label for="domisljijska">Domišljijska:</label>
+                    <label for="domisljijska">Domišljijska</label>
                     <div id="domisljijska"></div>
                     <span id="domisljijska-value" class="slider-value">50</span>
                     <input type="hidden" id="domisljijska-hidden" name="domisljijska" value="50" disabled>
@@ -288,40 +280,38 @@
                     <span class="slider-contrast">Zahtevna</span>
                 </div>
                 
-                
                 <input type="submit" value="Išči">
             </form>
         </div>
     
-    
-       <!-- Results Section -->
-       <div class="results">
-        % if similar_books:
-            <h2>Rezultati Iskanja</h2>
-            <table class="container_table">
-                <tr>
-                    <th class="table_th">NASLOV</th>
-                    <th class="table_th">AVTOR</th>
-                    <th class="table_th">LETO</th>
-                </tr>
-                % for book in similar_books:
-                    <tr class="clickable" id="book_{{book['book_id']}}" onclick="bookDataRedirect({{book['book_id']}})">
-                        <td title="Podrobni pregled" class="naslovClass" id="naslov_{{id}}" onclick="bookDataRedirect({{id}})">{{book['naslov']}}</td>
-                        <td>{{book['avtor']}}</td>
-                        <td>{{book['leto']}}</td>
+        <!-- Rezultati iskanja -->
+        <div class="results">
+            % if similar_books:
+                <h2>Rezultati Iskanja</h2>
+                <table class="container_table">
+                    <tr>
+                        <th class="table_th">NASLOV</th>
+                        <th class="table_th">AVTOR</th>
+                        <th class="table_th">LETO</th>
                     </tr>
-                % end
-            </table>
-        % else:
-            <p>Izberite lastnosti, po katerih želite iskati in pritisnite 'Išči' za rezultate.</p>
-        % end
+                    % for book in similar_books:
+                        <tr class="clickable" id="book_{{book['book_id']}}" onclick="bookDataRedirect({{book['book_id']}})">
+                            <td class="naslovClass" title="Podrobni pregled">{{book['naslov']}}</td>
+                            <td>{{book['avtor']}}</td>
+                            <td>{{book['leto']}}</td>
+                        </tr>
+                    % end
+                </table>
+            % else:
+                <p>Izberite lastnosti, po katerih želite iskati in pritisnite 'Išči' za rezultate.</p>
+            % end
+        </div>
     </div>
-</div>
-<script>
-    var bookDataRedirect = function(book_id) {
-        window.location.replace("https://hub.binder.curvenote.dev/user/dominikhrovat14-opb-projekt-zeitxam0/proxy/8080/knjiga?book_id=" + book_id);
-    };
-
-</script>
+    <script>
+        var bookDataRedirect = function(book_id) {
+            var relativeURL = "knjiga?book_id=" + book_id;
+            window.location.href = relativeURL;
+        }
+    </script>
 </body>
 </html>
