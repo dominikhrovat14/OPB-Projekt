@@ -3,11 +3,9 @@
 #   cur = sqlite3.connect('imenik.db', isolation_level=None)
 # se priklopimo tudi na postgres (le da bolj na dolgo vklopimo se nekaj prakticnih razsiritev):
 
-db="sem2023_milkag"
-user="milkag"
-#password="1pmlybto"
-password="ljhgej43"
-# geslo daj iz te datoteke, da ni na GitHubu!!!
+db="..."
+user="..."
+password="..."
 
 import psycopg2, psycopg2.extensions, psycopg2.extras
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s sumniki
