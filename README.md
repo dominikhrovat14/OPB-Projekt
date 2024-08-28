@@ -26,5 +26,5 @@ Baza že hrani podatke o nekaterih knjigah in avtorjih, med njimi so opisi, žan
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/dominikhrovat14/OPB-Projekt/main?urlpath=proxy%2F8080)
 
-![Sample Image][(https://github.com/username/repository/raw/main/path/to/your/image.jpg)]
+![Sample Image](https://github.com/dominikhrovat14/OPB-Projekt/blob/main/ER%20diagram.jpg)
 
