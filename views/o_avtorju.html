@@ -123,7 +123,8 @@
     <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
     <script>
         function bookDataRedirect(book_id) {
-            window.location.replace("https://hub.binder.curvenote.dev/user/dominikhrovat14-opb-projekt-zeitxam0/proxy/8080/knjiga?book_id=" + book_id);
+            var relativeURL = "knjiga?book_id=" + book_id;
+            window.location.href = relativeURL;
         }
     </script>
 </head>
@@ -131,12 +132,11 @@
     <div class="author-container">
         %for avtor in avtor_info:
             <div class="author-info">
-                <h1>{{ avtor[1] }}</h1> <!-- Only 'ime_avtor' -->
-                <p>{{ avtor[2] }}</p> <!-- Only 'zivljenjepis' -->
+                <h1>{{ avtor[1] }}</h1> 
+                <p>{{ avtor[2] }}</p> 
             </div>
         %end
 
-        <!-- Table for books -->
         <table class="container_table tableRounded" id="tableData">
             <tr>
                 <th class="table_th">NASLOV</th>
