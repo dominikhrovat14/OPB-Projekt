@@ -343,8 +343,7 @@ def registracija_post():
                                email=email, napaka="Vnešen email že obstaja!", noMenu='true')
 
     cur.execute("""INSERT INTO uporabnik (ime, priimek, username, mail, geslo, rojstvo, naslov, credit) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""", (name,surname, username,email,password, rojstvo,adress, 10, ))
-    redirect(url('prijava'))
-    
+    redirect(url('uporabnik'))
 
 #___________________________________________________________________________________________________________________________
 # BRSKALNIK
