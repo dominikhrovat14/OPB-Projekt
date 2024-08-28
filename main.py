@@ -342,7 +342,7 @@ def registracija_post():
         return template("registracija.html", name=name, surname=surname, username=username,
                                email=email, napaka="Vnešen email že obstaja!", noMenu='true')
 
-    cur.execute("""INSERT INTO uporabnik (ime, priimek, username, mail, geslo, rojstvo, naslov) VALUES (%s, %s, %s, %s, %s, %s, %s)""", (name,surname, username,email,password,'2021-05-20',adress, ))
+    cur.execute("""INSERT INTO uporabnik (ime, priimek, username, mail, geslo, rojstvo, naslov, credit) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""", (name,surname, username,email,password, rojstvo,adress, 10, ))
     redirect(url('uporabnik'))
 
 #___________________________________________________________________________________________________________________________
