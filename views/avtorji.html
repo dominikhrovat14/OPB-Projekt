@@ -85,14 +85,23 @@
         }
     </style>
 
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
-    <script>
-        var authorDataRedirect = function(author_id) {
-            window.location.replace("https://hub.binder.curvenote.dev/user/dominikhrovat14-opb-projekt-zeitxam0/proxy/8080/avtor?avtor_id=" + author_id);
-        }
-    </script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
+<script>
+    var authorDataRedirect = function(author_id) {
+        // Use a relative URL based on the current path
+        var relativeURL = "avtor?avtor_id=" + author_id;
+        window.location.href = relativeURL;
+    };
+
+    $(document).ready(function(){
+        $('#tableData').on('click', '.clickable', function() {
+            var avtor_id = $(this).attr('id').split('_')[1];
+            authorDataRedirect(avtor_id);
+        });
+    });
+</script>
 </head>
 <body>
     <table class="container_table tableRounded" id="tableData">
@@ -101,7 +110,7 @@
         </tr>
         %for (avtor_id, ime_avtor) in avtorji:
             <tr>
-                <td class="avtorClass clickable" id="avtor_{{avtor_id}}" onclick="authorDataRedirect({{avtor_id}})">{{ime_avtor}}</td>
+                <td class="avtorClass clickable" id="avtor_{{avtor_id}}">{{ime_avtor}}</td>
             </tr>
         %end
     </table>
